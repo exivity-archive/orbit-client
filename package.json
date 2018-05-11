@@ -1,0 +1,23 @@
+{
+  "name": "@exivity/proton",
+  "version": "0.0.1",
+  "private": true,
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "jscs": "^3.0.7"
+  },
+  "dependencies": {
+    "@orbit/core": "^0.15.13",
+    "@orbit/data": "^0.15.13",
+    "@orbit/store": "^0.15.13",
+    "@orbit/coordinator": "^0.15.13",
+    "@orbit/jsonapi": "^0.15.13",
+    "redux": "^4.0.0",
+    "redux-persist": "^5.9.1",
+    "redux-thunk": "^2.2.0"
+  },
+  "scripts": {
+    "jscs": "jscs src",
+    "test": "jest"
+  }
+}

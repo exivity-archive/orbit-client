@@ -1,0 +1,27 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# editor
+/.idea
+/.vscode
+
+# dependencies
+node_modules
+
+# testing
+coverage
+npm-debug.log*
+yarn-error.log
+
+# build
+/build
+/storybook
+/src/**/*.css
+/src/**/*.css.map
+/src/disclaimer
+/public/THIRD_PARTY_LICENSES.md
+
+# misc
+/.sass-cache
+.DS_Store
+.env
+npm-debug.log

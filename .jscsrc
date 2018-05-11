@@ -1,0 +1,34 @@
+{
+  "preset": "node-style-guide",
+  "requireCamelCaseOrUpperCaseIdentifiers": null,
+  "requireCurlyBraces": {
+    "keywords": [
+      "if",
+      "else",
+      "for",
+      "while",
+      "do",
+      "try",
+      "catch",
+      "switch"
+    ],
+    "allExcept": []
+  },
+  "requireCapitalizedConstructors": null,
+  "validateLineBreaks": null,
+  "disallowSemicolons": true,
+  "validateQuoteMarks": "\"",
+  "maximumLineLength": 120,
+  "disallowSpacesInFunction": {
+    "beforeOpeningRoundBrace": true
+  },
+  "requireSpacesInsideImportedObjectBraces": true,
+  "excludeFiles": [
+    "./src/components/App/routes.js",
+    "./src/components/hocs/LazyAceEditor/index.js",
+    "./src/components/hocs/LazyAmCharts/index.js",
+    "./src/components/pages/About/Disclaimer.js",
+    "./src/stories/components/markdown.js",
+    "./src/styles/uikit.js"
+  ]
+}

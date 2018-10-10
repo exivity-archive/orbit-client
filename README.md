@@ -1,1 +1,0 @@
-# Exivity JS SDK

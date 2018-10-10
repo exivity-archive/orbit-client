@@ -1,23 +1,21 @@
 {
-  "name": "@exivity/proton",
-  "version": "0.0.1",
-  "private": true,
-  "devDependencies": {
-    "eslint": "^4.19.1",
-    "jscs": "^3.0.7"
-  },
-  "dependencies": {
-    "@orbit/core": "^0.15.13",
-    "@orbit/data": "^0.15.13",
-    "@orbit/store": "^0.15.13",
-    "@orbit/coordinator": "^0.15.13",
-    "@orbit/jsonapi": "^0.15.13",
-    "redux": "^4.0.0",
-    "redux-persist": "^5.9.1",
-    "redux-thunk": "^2.2.0"
-  },
+  "name": "proton2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
   "scripts": {
-    "jscs": "jscs src",
-    "test": "jest"
+    "build": "webpack --mode production",
+    "test": "jest",
+    "lint": "eslint --cache --ext mjs,jsx,js src test"
+  },
+  "devDependencies": {
+    "@neutrinojs/jest": "^9.0.0-beta.0",
+    "@neutrinojs/library": "^9.0.0-beta.0",
+    "@neutrinojs/standardjs": "^9.0.0-beta.0",
+    "eslint": "^5",
+    "jest": "^23",
+    "neutrino": "^9.0.0-beta.0",
+    "webpack": "^4",
+    "webpack-cli": "^3"
   }
 }

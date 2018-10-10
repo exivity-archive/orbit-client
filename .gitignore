@@ -14,14 +14,8 @@ yarn-error.log
 
 # build
 /build
-/storybook
-/src/**/*.css
-/src/**/*.css.map
-/src/disclaimer
-/public/THIRD_PARTY_LICENSES.md
 
 # misc
 /.sass-cache
 .DS_Store
 .env
-npm-debug.log

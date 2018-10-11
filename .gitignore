@@ -13,7 +13,8 @@ npm-debug.log*
 yarn-error.log
 
 # build
-/build
+/dist
+/docs
 
 # misc
 /.sass-cache

@@ -1,21 +1,43 @@
 {
-  "name": "proton2",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "@exivity/proton",
+  "version": "0.0.1",
   "license": "MIT",
+  "module": "dist",
   "scripts": {
-    "build": "webpack --mode production",
+    "lint": "standard",
+    "lint:fix": "standard --fix",
     "test": "jest",
-    "lint": "eslint --cache --ext mjs,jsx,js src test"
+    "start": "start-storybook -p 6006",
+    "build": "yarn build:clean && yarn build:dist && yarn build:storybook",
+    "build:clean": "rimraf dist && rimraf docs",
+    "build:dist": "babel src --out-dir dist --source-maps",
+    "build:storybook": "build-storybook -o docs"
   },
   "devDependencies": {
-    "@neutrinojs/jest": "^9.0.0-beta.0",
-    "@neutrinojs/library": "^9.0.0-beta.0",
-    "@neutrinojs/standardjs": "^9.0.0-beta.0",
-    "eslint": "^5",
-    "jest": "^23",
-    "neutrino": "^9.0.0-beta.0",
-    "webpack": "^4",
-    "webpack-cli": "^3"
-  }
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-react": "^7.0.0",
+    "@storybook/addon-actions": "^4.0.0-alpha.24",
+    "@storybook/addon-links": "^4.0.0-alpha.24",
+    "@storybook/addons": "^4.0.0-alpha.24",
+    "@storybook/react": "^4.0.0-alpha.24",
+    "babel-loader": "^8.0.4",
+    "jest": "^23.6.0",
+    "rimraf": "^2.6.2",
+    "standard": "^12.0.1",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2"
+  },
+  "peerDependencies": {
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

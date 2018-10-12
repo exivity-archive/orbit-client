@@ -1,5 +1,5 @@
 @exivity/proton
-===========
+===============
 
 [![npm](https://img.shields.io/npm/v/@exivity/proton.svg)](https://www.npmjs.com/package/@exivity/proton)
 [![Travis](https://img.shields.io/travis/com/exivity/proton.svg)](https://travis-ci.com/exivity/proton)
@@ -9,7 +9,8 @@
 
 Exivity React SDK
 
-## Quickstart
+Quickstart
+----------
 
 Install with `yarn`
 

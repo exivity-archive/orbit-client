@@ -1,17 +1,38 @@
 {
   "name": "@exivity/proton",
   "version": "0.0.1",
+  "description": "Exivity React SDK",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/exivity/proton.git"
+  },
+  "keywords": [
+    "exivity",
+    "proton"
+  ],
+  "author": "Joram van den Boezem <joram@vandenboezem.nl>",
+  "bugs": {
+    "url": "https://github.com/exivity/proton/issues"
+  },
+  "homepage": "https://github.com/exivity/proton",
+  "main": "dist/index.js",
   "module": "dist",
+  "files": [
+    "src",
+    "dist"
+  ],
   "scripts": {
-    "lint": "standard",
-    "lint:fix": "standard --fix",
+    "lint": "standard src",
+    "lint:fix": "standard src --fix",
     "test": "jest",
-    "start": "start-storybook -p 6006",
-    "build": "yarn build:clean && yarn build:dist && yarn build:storybook",
+    "start": "start-storybook -p 6007",
+    "build": "yarn build:clean && yarn build:dist && yarn build:docs",
     "build:clean": "rimraf dist && rimraf docs",
-    "build:dist": "babel src --out-dir dist --source-maps",
-    "build:storybook": "build-storybook -o docs"
+    "build:dist": "babel src --out-dir dist --source-maps --ignore \"src/**/*.stories.js\",\"src/**/*.test.js\"",
+    "build:docs": "build-storybook -o docs",
+    "publish:docs": "yarn build:clean && yarn build:docs && git add docs && git commit -m \"chore: update docs\" && git subtree push --prefix docs origin gh-pages",
+    "prepublishOnly": "yarn lint && yarn test && yarn build"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.2",
@@ -20,16 +41,25 @@
     "@babel/preset-env": "^7.1.0",
     "@babel/preset-react": "^7.0.0",
     "@storybook/addon-actions": "^4.0.0-alpha.24",
+    "@storybook/addon-info": "^4.0.0-alpha.24",
+    "@storybook/addon-knobs": "^4.0.0-alpha.24",
     "@storybook/addon-links": "^4.0.0-alpha.24",
+    "@storybook/addon-options": "^4.0.0-alpha.24",
     "@storybook/addons": "^4.0.0-alpha.24",
     "@storybook/react": "^4.0.0-alpha.24",
+    "babel-core": "^7.0.0-bridge",
+    "babel-jest": "^23.6.0",
     "babel-loader": "^8.0.4",
     "jest": "^23.6.0",
-    "rimraf": "^2.6.2",
-    "standard": "^12.0.1",
+    "prop-types": "^15.6.2",
     "react": "^16.5.2",
-    "react-dom": "^16.5.2"
+    "react-dom": "^16.5.2",
+    "react-test-renderer": "^16.5.2",
+    "rimraf": "^2.6.2",
+    "standard": "^12.0.1"
   },
+  "dependencies": {},
+  "optionalDependencies": {},
   "peerDependencies": {
     "react": "^16.5.2",
     "react-dom": "^16.5.2"
@@ -39,5 +69,16 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "jest": {
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/**/*.stories.js"
+    ],
+    "roots": [
+      "<rootDir>/src/"
+    ]
+  }
 }

@@ -32,7 +32,7 @@
     "build:dist": "babel src --out-dir dist --source-maps --ignore \"src/**/*.stories.js\",\"src/**/*.test.js\"",
     "build:docs": "build-storybook -o docs",
     "publish:docs": "yarn build:clean && yarn build:docs && git add docs && git commit -m \"chore: update docs\" && git subtree push --prefix docs origin gh-pages",
-    "prepublishOnly": "yarn lint && yarn test && yarn build"
+    "prepublishOnly": "yarn lint yarn&& yarn test && yarn build"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.2",
@@ -59,7 +59,12 @@
     "rimraf": "^2.6.2",
     "standard": "^12.0.1"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@orbit/coordinator": "^0.15.23",
+    "@orbit/data": "^0.15.23",
+    "@orbit/store": "^0.15.23",
+    "react-orbitjs": "^0.1.10"
+  },
   "optionalDependencies": {},
   "peerDependencies": {
     "react": "^16.5.2",

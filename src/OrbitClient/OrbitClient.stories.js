@@ -2,10 +2,8 @@ import React, { PureComponent } from 'react'
 import { storiesOf } from '@storybook/react'
 import { withState } from '../../.storybook/stateDecorator'
 
-import Planet from './entity/Planet'
-import Planets from './entity/Planets'
-
-import store from '../../.storybook/orbitStories/store'
+import Planet from '../../.storybook/orbitStories/Planet'
+import Planets from '../../.storybook/orbitStories/Planets'
 
 const PLANET = {
   type: 'planet',

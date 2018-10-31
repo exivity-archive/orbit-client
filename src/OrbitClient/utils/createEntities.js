@@ -1,14 +1,24 @@
+#!/usr/bin/env node
+
 const fs = require('fs')
-const path = require('path')
 const babel = require('@babel/core')
+const pluralize = require('pluralize')
 
-const pathUtils = './src/OrbitClient/utils'
-const pathEntity = './src/OrbitClient/entity'
+const pathUtils = './node_modules/@exivity/proton/src/OrbitClient/utils'
 
-fs.readFile('./src/OrbitClient/occonfig.json', 'utf8', (err, data) => {
+fs.readFile('./occonfig.json', 'utf8', (err, data) => {
   if (err) throw err
-  const relativeSchemaPathConfig = JSON.parse(data).schema
-  const relativeSchemaPath = path.join(...relativeSchemaPathConfig.split('/'))
+  const relativeSchemaPath = JSON.parse(data).schema
+  const relativeTargetPath = JSON.parse(data).target + '/OrbitClient'
+  const pathEntities = relativeTargetPath + '/entity'
+
+  if (!fs.existsSync(relativeTargetPath)) {
+    fs.mkdirSync(relativeTargetPath)
+  }
+
+  if (!fs.existsSync(pathEntities)) {
+    fs.mkdirSync(pathEntities)
+  }
 
   fs.readFile(relativeSchemaPath, 'utf8', (err, data) => {
     if (err) throw err
@@ -16,18 +26,18 @@ fs.readFile('./src/OrbitClient/occonfig.json', 'utf8', (err, data) => {
       presets: [ '@babel/preset-env']
     }, (err, result) => {
       if (err) throw err
-      fs.writeFile(pathUtils + '/tempSchema.js', result.code, (err) => {
+      fs.writeFile('./tempSchema.js', result.code, (err) => {
         if (err) throw err
         console.log('Created temporary schema file...')
-        const schema = require('./tempSchema')
+        const schema = require('../../../../../../tempSchema')
         const models = Object.keys(schema.default.models)
 
         models.forEach((model) => {
-          createRecordComponent(model)
-          createRecordsComponent(model)
+          createRecordComponent(model, pathEntities)
+          createRecordsComponent(model, pathEntities)
         })
 
-        fs.unlink(pathUtils + '/tempSchema.js', (err) => {
+        fs.unlink('./tempSchema.js', (err) => {
           if (err) throw err
           console.log('Deleted temporary schema file...')
         })
@@ -38,33 +48,33 @@ fs.readFile('./src/OrbitClient/occonfig.json', 'utf8', (err, data) => {
 
 const capitalize = ([first, ...rest]) => first.toUpperCase() + rest.join('')
 
-const createRecordComponent = (model) => {
+const createRecordComponent = (model, savePath) => {
   fs.readFile(pathUtils + '/templates/entity.js', 'utf8', (err, result) => {
     if (err) throw err
     const capitalizedModel = capitalize(model)
     const component = result.replace(/_Entity/g, capitalizedModel)
     const finished = component.replace(/_entity/g, model)
 
-    const savePath = pathEntity + '/' + capitalizedModel + '.js'
-    fs.writeFile(savePath, finished, (err) => {
+    const path = savePath + '/' + capitalizedModel + '.js'
+    fs.writeFile(path, finished, (err) => {
       if (err) throw err
-      console.log('Created: ', savePath)
+      console.log('Created: ', path)
     })
   })
 }
 
-const createRecordsComponent = (model) => {
+const createRecordsComponent = (model, savePath) => {
   fs.readFile(pathUtils + '/templates/entities.js', 'utf8', (err, result) => {
     if (err) throw err
-    const capitalizedModel = capitalize(model) + 's'
+    const capitalizedModel = pluralize(capitalize(model))
     const Entities = result.replace(/_Entities/g, capitalizedModel)
     const entity = Entities.replace(/_entity/g, model)
-    const entities = entity.replace(/_entities/g, model + 's')
+    const entities = entity.replace(/_entities/g, pluralize(model))
 
-    const savePath = pathEntity + '/' + capitalizedModel + '.js'
-    fs.writeFile(savePath, entities, (err) => {
+    const path = savePath + '/' + capitalizedModel + '.js'
+    fs.writeFile(path, entities, (err) => {
       if (err) throw err
-      console.log('Created: ', savePath)
+      console.log('Created: ', path)
     })
   })
 }

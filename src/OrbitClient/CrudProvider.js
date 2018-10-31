@@ -1,3 +1,5 @@
 import { createContext } from 'react'
 
-export const CrudContext = createContext({})
+const CrudContext = createContext({})
+
+export default CrudContext

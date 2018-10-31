@@ -83,4 +83,4 @@ const mapRecordsToProps = (ownProps) => {
   return {}
 }
 
-// export default withData(mapRecordsToProps)(OrbitClient)
+export default withData(mapRecordsToProps)(OrbitClient)

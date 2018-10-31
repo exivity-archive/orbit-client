@@ -1,1 +1,1 @@
-export { default } from './Crud'
+export { default  } from './Crud'

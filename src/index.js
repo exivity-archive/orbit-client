@@ -1,2 +1,4 @@
 export { default as Crud } from './Crud'
-export { default as OrbitClient } from './OrbitClient'
+export { CrudContext } from './OrbitClient'
+export { decorateQuery } from './OrbitClient'
+export { withCrudConsumer } from './OrbitClient'

@@ -1,1 +1,0 @@
-{"version":3,"file":"static/iframe.1545804c4c3923728bae.bundle.js","sources":["webpack:///./src/OrbitClient/CrudProvider.js"],"sourcesContent":["import { createContext } from 'react'\r\n\r\nexport const CrudContext = createContext({})\r\n"],"mappings":"AAAA","sourceRoot":""}

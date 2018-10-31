@@ -2,8 +2,7 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { withData } from 'react-orbitjs'
 
-import { CrudContext } from '../CrudProvider'
-import { decorateQuery } from '../utils/decorateQuery'
+import { CrudContext, decorateQuery } from '@exivity/proton'
 
 class _Entities extends PureComponent {
   constructor (props) {
@@ -46,7 +45,7 @@ class _Entities extends PureComponent {
     if (record.id) {
       return t.replaceRecord(record)
     }
-     return t.addRecord(record)
+   return t.addRecord(record)
   })
 
   buildRemoveTransforms = (records) => (t) => records.map((record) => {
@@ -82,7 +81,7 @@ class _Entities extends PureComponent {
           remove: (records) => performTransforms(this.buildRemoveTransforms(records))
         })}
       </CrudContext.Consumer>
-      )
+    )
   }
 }
 
@@ -95,6 +94,8 @@ const mapRecordsToProps = ({ sort, filter, page }) => {
 export default withData(mapRecordsToProps)(_Entities)
 
 _Entities.propTypes = {
+  _entities: PropTypes.array,
+  queryStore: PropTypes.func,
   sort: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.object

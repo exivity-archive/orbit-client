@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react'
+import PropTypes from 'prop-types'
 import { withData } from 'react-orbitjs'
 
-import Crud from '../../Crud'
-import { withCrudConsumer } from '../crudConsumer'
+import { Crud, withCrudConsumer } from '@exivity/proton'
 
 class _Entity extends PureComponent {
   constructor (props) {
@@ -86,28 +86,28 @@ class _Entity extends PureComponent {
     }
   }
 
-  queryStoreById = async (id) => {
-    try {
-      await this.props.queryStore(q => q.findRecord({ type: '_entity', id }))
-      this.setState({ loading: false })
-    } catch (error) {
-      this.setState({
-        loading: false,
-        error
+  queryStoreById = (id) => {
+    this.props.queryStore(q => q.findRecord({ type: '_entity', id }))
+      .then(() => this.setState({ loading: false }))
+      .catch((error) => {
+        this.setState({
+          loading: false,
+          error
+        })
       })
-    }
   }
 
   setAttribute = (attribute) => (value) => {
     this.setState(({ _entity }) => ({
       _entity: {
-      ..._entity,
-      attributes: {
-        ..._entity.attributes,
-        [attribute]: value
+        ..._entity,
+        attributes: {
+          ..._entity.attributes,
+          [attribute]: value
+        }
       }
-    }
-  }))}
+    }))
+  }
 
   setRelationship = (relationship) => (value) => {
     this.setState(({ _entity }) => ({
@@ -173,3 +173,18 @@ const mapRecordsToProps = (ownProps) => {
 const WithConsumer = withCrudConsumer(_Entity)
 
 export default withData(mapRecordsToProps)(WithConsumer)
+
+_Entity.propTypes = {
+  _entity: PropTypes.object,
+  id: PropTypes.string,
+  buildRecord: PropTypes.func,
+  addRecord: PropTypes.func,
+  updateRecord: PropTypes.func,
+  removeRecord: PropTypes.func,
+  beforeAdd: PropTypes.func,
+  onAdd: PropTypes.func,
+  beforeUpdate: PropTypes.func,
+  onUpdate: PropTypes.func,
+  beforeRemove: PropTypes.func,
+  onRemove: PropTypes.func
+}

@@ -1,8 +1,9 @@
 import React, { PureComponent } from 'react'
-import { CrudContext } from './CrudProvider'
+import CrudContext from './CrudProvider'
+import 'babel-polyfill'
 
-export const withCrudConsumer = (WrappedComponent) => {
-  return class _EntityWithCrudConsumer extends PureComponent {
+const withCrudConsumer = (WrappedComponent) => {
+  return class EntityWithCrudConsumer extends PureComponent {
     render () {
       return (
         <CrudContext.Consumer>
@@ -14,3 +15,5 @@ export const withCrudConsumer = (WrappedComponent) => {
     }
   }
 }
+
+export default withCrudConsumer

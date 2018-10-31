@@ -1,4 +1,4 @@
-export const decorateQuery = (queryFn, options) => {
+const decorateQuery = (queryFn, options) => {
   const expressions = Object.keys(options).reduce((acc, key) => {
     if (options[key]) acc[key] = options[key]
     return acc
@@ -8,3 +8,5 @@ export const decorateQuery = (queryFn, options) => {
     return (...args) => query(...args)[key](value)
   }, queryFn)
 }
+
+export default decorateQuery

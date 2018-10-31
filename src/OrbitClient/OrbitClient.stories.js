@@ -213,7 +213,7 @@ storiesOf('components|OrbitClient', module)
               { type: 'planet', id: 'exivity to the moon', attributes: { name: 'Rocket'}  },
               { type: 'planet', id: 'neptunus', attributes: { name: 'Neptunusr'} }
             ])}>Create records</button>
-            <button onClick={() => remove(planets)}>Delete all records</button>
+            <button onClick={() => remove(planets.all())}>Delete all records</button>
             <button onClick={() => {
               storeState({ sortOrder: state.sortOrder === 'ascending' ? 'descending' : 'ascending' })
             }}>

@@ -6,7 +6,7 @@ import { withOptions } from '@storybook/addon-options'
 
 import { WithStyle } from '@exivity/ui'
 import { DataProvider } from 'react-orbitjs'
-import dataStore from '../src/OrbitClient/orbit/store'
+import dataStore from './orbitStories/store'
 import { CrudContext } from '../src/OrbitClient/CrudProvider'
 
 const options = {

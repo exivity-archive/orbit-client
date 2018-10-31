@@ -32,7 +32,8 @@
     "build:dist": "babel src --out-dir dist --source-maps --ignore \"src/**/*.stories.js\",\"src/**/*.test.js\"",
     "build:docs": "build-storybook -o docs",
     "publish:docs": "yarn build:clean && yarn build:docs && git add docs && git commit -m \"chore: update docs\" && git subtree push --prefix docs origin gh-pages",
-    "prepublishOnly": "yarn lint yarn&& yarn test && yarn build"
+    "prepublishOnly": "yarn lint yarn&& yarn test && yarn build",
+    "build:entities": "node ./src/OrbitClient/utils/createEntities.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.2",

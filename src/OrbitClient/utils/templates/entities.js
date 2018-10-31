@@ -6,6 +6,14 @@ import { CrudContext } from '../CrudProvider'
 import { decorateQuery } from '../utils/decorateQuery'
 
 class _Entities extends PureComponent {
+  constructor (props) {
+    super (props)
+
+    this.state = {
+      loading: false
+    }
+  }
+
   componentDidMount () {
     const { _entities } = this.props
 
@@ -14,6 +22,24 @@ class _Entities extends PureComponent {
         loading: true,
       }, this.queryStore)
     }
+  }
+
+  findOne = (id) => {
+    const { _entities } = this.props
+
+    return _entities.find(item => item.id === id)
+  }
+
+  find = (ids) => {
+    const { _entities } = this.props
+
+    return ids.map(id =>  _entities.find(item => item.id === id))
+  }
+
+  findByAttribute = ({ attribute, value }) => {
+    const { _entities } = this.props
+
+    return _entities.filter(item => item.attributes[attribute] === value)
   }
 
   buildSaveTransforms = (records) => (t) => records.map((record) => {
@@ -40,11 +66,18 @@ class _Entities extends PureComponent {
 
   render () {
     const { _entities } = this.props
+    const { loading } = this.state
 
     return (
       <CrudContext.Consumer>
         {({ performTransforms }) => this.props.children({
-          _entities,
+          _entities: {
+            findOne: this.findOne,
+            find: this.find,
+            findByAttribute: this.findByAttribute,
+            all: () => _entities
+          },
+          loading,
           save: (records) => performTransforms(this.buildSaveTransforms(records)),
           remove: (records) => performTransforms(this.buildRemoveTransforms(records))
         })}

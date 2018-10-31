@@ -1,1 +1,1 @@
-export { default as OrbitClient } from './OrbitClient'
+export { default } from './OrbitClient'

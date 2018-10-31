@@ -125,7 +125,7 @@ class AllPlanets extends PureComponent {
         <Planets>
           {({ planets }) => (
             <ul>
-              {planets.map(planet => <li key={planet.id}>{planet.id}</li>)}
+              {planets.all().map(planet => <li key={planet.id}>{planet.id}</li>)}
             </ul>
           )}
         </Planets>
@@ -206,7 +206,7 @@ storiesOf('components|OrbitClient', module)
         {({ planets, save, remove }) => (
           <div>
             <ul>
-              {planets.map(planet => <li key={planet.id}>{planet.id}</li>)}
+              {planets.all().map(planet => <li key={planet.id}>{planet.id}</li>)}
             </ul>
             <button onClick={() => save([
               { type: 'planet', id: 'mars', attributes: { name: 'Mars'} },

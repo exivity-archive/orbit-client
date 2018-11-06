@@ -16,7 +16,7 @@ class Model extends PureComponent {
     let state
 
     if (!props.related) {
-      const recordNotFoundInCache = props.id && !props[props.type]
+      const recordNotFoundInCache = !!props.id && !props[props.type]
 
       state = {
         idReference: props.id,
@@ -36,7 +36,7 @@ class Model extends PureComponent {
         recordReference: record,
         [props.type]: record,
         searchedAllSources: false,
-        loading: relatedRecordNotFoundInCache,
+        loading: !!relatedRecordNotFoundInCache,
         error: false
       }
     }
@@ -240,10 +240,10 @@ class Model extends PureComponent {
     const receivedEntities = omit(this.props, [...notAllowedProps, type])
 
     const queryStatus = {
-      loading: this.props.loading || this.state.loading,
+      loading: !!this.props.loading || this.state.loading,
       error: this.props.error || this.state.error
     }
-
+    
     return (
       <Crud {...this.props} onRemove={this.onRemove}>
         {({ add, update, remove }) => {

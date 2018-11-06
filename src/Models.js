@@ -33,13 +33,15 @@ class Models extends PureComponent {
   }
 
   componentDidUpdate (prevProps) {
-    const { [this.props.type]: records } = this.props
+    const { [this.props.type]: records, related } = this.props
     const { [prevProps.type]: prevRecords } = prevProps
 
     if (records !== prevRecords && !records.length) {
       this.setState({
         loading: true,
-      }, this.queryStore)
+      }, related
+        ? this.queryStoreRelated
+        : this.queryStore)
     }
   }
 
@@ -100,7 +102,7 @@ class Models extends PureComponent {
     const receivedEntities = omit(this.props, [...notAllowedProps, type])
 
     const queryStatus = {
-      loading: this.props.loading || this.state.loading,
+      loading: !!this.props.loading || this.state.loading,
       error: this.props.error || this.state.error
     }
 

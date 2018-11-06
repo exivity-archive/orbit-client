@@ -1,6 +1,6 @@
 {
   "name": "orbit-client",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "React client for orbitjs",
   "license": "MIT",
   "repository": {
@@ -19,7 +19,7 @@
   "main": "dist/index.js",
   "module": "dist/index.js",
   "bin": {
-    "orbit-client:build": "./src/orbit-client/utils/createEntities.js"
+    "orbit-client": "./src/orbit-client/utils/createEntities.js"
   },
   "files": [
     "src",

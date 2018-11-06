@@ -1,6 +1,6 @@
 import React from 'react'
 import Model from '../../src/OrbitClient/Model'
 
-const Moon = (props) => <Model type='moon' {...props} />
+const Sun = (props) => <Model type='sun' {...props}/>
 
-export default Moon
+export default Sun

@@ -5,6 +5,15 @@ const store = new Store({
   schema
 })
 
+const sun = {
+  type: 'sun',
+  id: 'sun',
+  attributes: {
+    name: 'Sun',
+    classification: 'Fusion giant'
+  }
+}
+
 const jupiter = {
   type: 'planet',
   id: 'jupiter',
@@ -22,6 +31,9 @@ const earth = {
     name: 'Earth',
     classification: 'terrestrial',
     atmosphere: true
+  },
+  relationships: {
+    sun: { data: { type: 'sun', id: 'sun' } }
   }
 }
 
@@ -69,6 +81,7 @@ const theMoon = {
 }
 
 store.update(t => [
+  t.addRecord(sun),
   t.addRecord(jupiter),
   t.addRecord(earth),
   t.addRecord(venus),

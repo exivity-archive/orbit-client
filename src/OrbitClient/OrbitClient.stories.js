@@ -4,16 +4,8 @@ import { withState } from '../../.storybook/stateDecorator'
 
 import Planet from '../../.storybook/orbitStories/Planet'
 import Planets from '../../.storybook/orbitStories/Planets'
-
-const PLANET = {
-  type: 'planet',
-  id: undefined,
-  attributes: {
-    name: '',
-    classification: '',
-    atmosphere: true
-  }
-}
+import Moons from '../../.storybook/orbitStories/Moons'
+import Sun from '../../.storybook/orbitStories/Sun'
 
 const jsonReplacer = function (key, val) {
   if (typeof val === 'function') {
@@ -134,6 +126,25 @@ class AllPlanets extends PureComponent {
   }
 }
 
+class AllRelated extends PureComponent {
+  render () {
+    const { moons, sun } = this.props
+
+    return (
+      <div>
+        <h3>Related moons</h3>
+        <ul>
+          {moons.all().map(moon => <li key={moon.id}>{moon.id}</li>)}
+        </ul>
+        <h3>Related sun</h3>
+        <ul>
+          <li key={sun && sun.id}>{sun && sun.id}</li>
+        </ul>
+      </div>
+    )
+  }
+}
+
 const delayBeforeTransform = () => new Promise((resolve, reject) => {
   setTimeout(() => resolve(true), 3000)
 })
@@ -141,7 +152,7 @@ const delayBeforeTransform = () => new Promise((resolve, reject) => {
 storiesOf('components|OrbitClient', module)
   .addDecorator(CenterField)
   .addDecorator(withState({
-    planetId: undefined,
+    planetId: 'earth',
     beforeAddCalled: false,
     onAddCalled: false,
     beforeUpdateCalled: false,
@@ -157,7 +168,6 @@ storiesOf('components|OrbitClient', module)
     }}>
       <FindPlanet state={state} storeState={storeState} />
       <Planet id={state.planetId}
-        buildRecord={() => PLANET}
         beforeAdd={() => {
           storeState({ beforeAddCalled: true })
           return delayBeforeTransform()
@@ -196,6 +206,33 @@ storiesOf('components|OrbitClient', module)
             </Container>
           )
         }}
+      </Planet>
+    </div>
+  ))
+  .add('Single entity with relations', ({ state, storeState }) => (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
+      <FindPlanet state={state} storeState={storeState} />
+      <Planet id={state.planetId}>
+        <Moons related>
+          <Sun related>
+            {(props) => {
+              const { planet, moons, sun, loading, error } = props
+              if (error) return error.message
+              if (loading) return 'Loading'
+              return (
+                <Container>
+                  <PlanetForm planet={planet} state={state} />
+                  <ActiveRecord planet={planet} />
+                  <AllPlanets />
+                  <AllRelated moons={moons} sun={sun} />
+                </Container>
+              )
+            }}
+          </Sun>
+        </Moons>
       </Planet>
     </div>
   ))

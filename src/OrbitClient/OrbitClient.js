@@ -1,8 +1,7 @@
 import React, { PureComponent } from 'react'
 import { withData } from 'react-orbitjs'
+import CrudContext from './CrudProvider'
 
-
-// Still needs to be developed
 class OrbitClient extends PureComponent {
   componentDidMount () {
     const { _entities } = this.props
@@ -23,7 +22,7 @@ class OrbitClient extends PureComponent {
   find = (ids) => {
     const { _entities } = this.props
 
-    return ids.map(id =>  _entities.find(item => item.id === id))
+    return ids.map(id => _entities.find(item => item.id === id))
   }
 
   findByAttribute = ({ attribute, value }) => {
@@ -54,7 +53,6 @@ class OrbitClient extends PureComponent {
     }
   }
   render () {
-    if (this.props.query) {
       const queryKeys = Object.keys(this.props.query)
       const queryHandlers = queryKeys.reduce((handlers, query) => {
         handlers[query] = this.props[query]
@@ -62,16 +60,12 @@ class OrbitClient extends PureComponent {
       }, {})
 
       return (
-        <WrappedComponent {...this.props} key={this.props.id}>
-          {(handlers) => this.props.children({
-            ...handlers,
-            ...queryHandlers
-          })}
-        </WrappedComponent>
+        <CrudContext.Consumer>
+          {({ build, add, update, remove, performTransforms }) => (
+            this.props.children({})
+          )}
+        </CrudContext.Consumer>
       )
-    }
-
-    return null
   }
 }
 

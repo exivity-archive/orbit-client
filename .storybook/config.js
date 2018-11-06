@@ -7,7 +7,9 @@ import { withOptions } from '@storybook/addon-options'
 import { WithStyle } from '@exivity/ui'
 import { DataProvider } from 'react-orbitjs'
 import dataStore from './orbitStories/store'
-import { CrudContext } from '../src/OrbitClient/CrudProvider'
+import CrudContext from '../src/OrbitClient/CrudProvider'
+
+import schema from './orbitStories/schema'
 
 const options = {
   name: '@exivity/proton',
@@ -27,15 +29,27 @@ const withStyle = story => <div style={{
   </WithStyle>
 </div>
 
+const PLANET = (type) => ({
+  type,
+  id: undefined,
+  attributes: {
+    name: '',
+    classification: '',
+    atmosphere: true
+  }
+})
+
 const addRecord = (record) => dataStore.update(t => t.addRecord(record))
 const updateRecord = (record) => dataStore.update(t => t.replaceRecord(record))
 const removeRecord = (record) => dataStore.update(t => t.removeRecord(record))
 
 const crud = {
+  buildRecord: (type) => PLANET(type),
   addRecord,
   updateRecord,
   removeRecord,
-  performTransforms: (transforms) => dataStore.update(transforms)
+  performTransforms: (transforms) => dataStore.update(transforms),
+  getRelationships: (model) => schema.models[model].relationships
 }
 
 class Provider extends Component {

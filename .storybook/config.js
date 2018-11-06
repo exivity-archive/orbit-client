@@ -7,13 +7,13 @@ import { withOptions } from '@storybook/addon-options'
 import { WithStyle } from '@exivity/ui'
 import { DataProvider } from 'react-orbitjs'
 import dataStore from './orbitStories/store'
-import CrudContext from '../src/OrbitClient/CrudProvider'
+import CrudContext from '../src/CrudProvider'
 
 import schema from './orbitStories/schema'
 
 const options = {
-  name: '@exivity/proton',
-  url: 'https://github.com/exivity/proton',
+  name: '@exivity/orbit-client',
+  url: 'https://github.com/exivity/orbit-client',
   showAddonPanel: true,
   addonPanelInRight: true,
   hierarchySeparator: /\/|\./,

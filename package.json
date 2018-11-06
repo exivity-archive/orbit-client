@@ -1,25 +1,25 @@
 {
-  "name": "@exivity/proton",
-  "version": "0.0.21",
-  "description": "Exivity React SDK",
+  "name": "orbit-client",
+  "version": "0.0.1",
+  "description": "React client for orbitjs",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/exivity/proton.git"
+    "url": "https://github.com/exivity/orbit-client.git"
   },
   "keywords": [
     "exivity",
-    "proton"
+    "orbit-client"
   ],
-  "author": "Joram van den Boezem <joram@vandenboezem.nl>",
+  "author": "Michiel de Vos <Michiel_87@hotmail.com>",
   "bugs": {
-    "url": "https://github.com/exivity/proton/issues"
+    "url": "https://github.com/exivity/orbit-client/issues"
   },
-  "homepage": "https://github.com/exivity/proton",
+  "homepage": "https://github.com/exivity/orbit-client",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "bin": {
-    "OrbitClient:build": "./src/OrbitClient/utils/createEntities.js"
+    "orbit-client:build": "./src/orbit-client/utils/createEntities.js"
   },
   "files": [
     "src",
@@ -36,7 +36,7 @@
     "build:docs": "build-storybook -o docs",
     "publish:docs": "yarn build:clean && yarn build:docs && git add docs && git commit -m \"chore: update docs\" && git subtree push --prefix docs origin gh-pages",
     "prepublishOnly": "yarn lint yarn&& yarn test && yarn build",
-    "build:entities": "node ./src/OrbitClient/utils/createStoryBookEntities.js"
+    "build:entities": "node ./src/orbit-client/utils/createStoryBookEntities.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.2",

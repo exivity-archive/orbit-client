@@ -1,11 +1,11 @@
 import React, { PureComponent } from 'react'
 import { storiesOf } from '@storybook/react'
-import { withState } from '../../.storybook/stateDecorator'
+import { withState } from '../.storybook/stateDecorator'
 
-import Planet from '../../.storybook/orbitStories/Planet'
-import Planets from '../../.storybook/orbitStories/Planets'
-import Moons from '../../.storybook/orbitStories/Moons'
-import Sun from '../../.storybook/orbitStories/Sun'
+import Planet from '../.storybook/orbitStories/Planet'
+import Planets from '../.storybook/orbitStories/Planets'
+import Moons from '../.storybook/orbitStories/Moons'
+import Sun from '../.storybook/orbitStories/Sun'
 
 const jsonReplacer = function (key, val) {
   if (typeof val === 'function') {
@@ -149,7 +149,7 @@ const delayBeforeTransform = () => new Promise((resolve, reject) => {
   setTimeout(() => resolve(true), 3000)
 })
 
-storiesOf('components|OrbitClient', module)
+storiesOf('components|orbit-client', module)
   .addDecorator(CenterField)
   .addDecorator(withState({
     planetId: 'earth',

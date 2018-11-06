@@ -4,7 +4,6 @@ import { withData } from 'react-orbitjs'
 import pluralize from 'pluralize'
 import omit from 'lodash/omit'
 
-// import { CrudContext, decorateQuery } from '@exivity/proton'
 import CrudContext from './CrudProvider'
 import decorateQuery from './utils/decorateQuery'
 

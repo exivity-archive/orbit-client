@@ -1,6 +1,6 @@
 import React from 'react'
-import Model from '../../src/OrbitClient/Model'
+import Model from 'orbit-client'
 
-const Planet = (props) => <Model {...props} type='planet'/>
+export const Planet = (props) => <Model {...props} type='planet'/>
 
 export default Planet

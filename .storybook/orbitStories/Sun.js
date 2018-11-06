@@ -1,5 +1,5 @@
 import React from 'react'
-import Model from '../../src/OrbitClient/Model'
+import Model from '../../src/Model'
 
 const Sun = (props) => <Model type='sun' {...props}/>
 

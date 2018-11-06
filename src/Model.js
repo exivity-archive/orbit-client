@@ -3,8 +3,7 @@ import PropTypes from 'prop-types'
 import { withData } from 'react-orbitjs'
 import omit from 'lodash/omit'
 
-// import { Crud, withCrudConsumer } from '@exivity/proton'
-import Crud from '../Crud/Crud'
+import Crud from './Crud'
 import withCrudConsumer from './crudConsumer'
 
 const notAllowedProps = ['id', 'type', 'related', 'relatedTo', 'children', 'queryStore', 'updateStore',

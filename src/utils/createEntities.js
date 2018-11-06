@@ -24,7 +24,7 @@ fs.readFile('./occonfig.json', 'utf8', (err, data) => {
       fs.writeFile('./tempSchema.js', result.code, (err) => {
         if (err) throw err
         console.log('Created temporary schema file...')
-        const schema = require('../../../../../tempSchema')
+        const schema = require('../../../../tempSchema')
         const models = Object.keys(schema.default.models)
 
         createComponentIndex(models, targetPath)
@@ -47,8 +47,8 @@ const createComponentIndex = (models, savePath) => {
     const index = models.reduce((code, model) => {
       const entity = capitalize(model)
       const entities = pluralize(capitalize(model))
-      return code + `export const ${entity} = (props) => <Model type={${model}} {...props} /> \n` +
-        `export const ${entities} = (props) => <Model type={${pluralize(model)}} {...props} /> \n`
+      return code + `export const ${entity} = (props) => <Model type={${model}} {...props} />\n` +
+        `export const ${entities} = (props) => <Models type={${pluralize(model)}} {...props} />\n`
     }, result)
 
     const path = savePath + '/index.js'

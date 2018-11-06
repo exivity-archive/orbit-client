@@ -1,0 +1,1 @@
+{"version":3,"file":"static/iframe.c8f4fe384ca0d09ed1f6.bundle.js","sources":["webpack:///./src/CrudProvider.js"],"sourcesContent":["import { createContext } from 'react'\r\n\r\nconst CrudContext = createContext({})\r\n\r\nexport default CrudContext\r\n"],"mappings":"AAAA","sourceRoot":""}

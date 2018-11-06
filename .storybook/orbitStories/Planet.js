@@ -1,5 +1,5 @@
 import React from 'react'
-import Model from 'orbit-client'
+import Model from '../../src/Model'
 
 export const Planet = (props) => <Model {...props} type='planet'/>
 

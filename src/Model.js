@@ -133,6 +133,7 @@ class Model extends PureComponent {
 
       if (noRelatedRecord && props.required) {
         return {
+          loading: false,
           error: {
             message: `Related ${props.type} has not been found while being required`
           }
@@ -243,7 +244,7 @@ class Model extends PureComponent {
       loading: !!this.props.loading || this.state.loading,
       error: this.props.error || this.state.error
     }
-    
+
     return (
       <Crud {...this.props} onRemove={this.onRemove}>
         {({ add, update, remove }) => {

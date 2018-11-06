@@ -217,7 +217,7 @@ storiesOf('components|orbit-client', module)
       <FindPlanet state={state} storeState={storeState} />
       <Planet id={state.planetId}>
         <Moons>
-          <Sun>
+          <Sun related>
             {(props) => {
               const { planet, moons, sun, loading, error } = props
               console.log(loading, error)

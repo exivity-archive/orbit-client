@@ -25,6 +25,7 @@ class Models extends PureComponent {
     if (!records.length) {
       this.setState({
         loading: true,
+        error: false,
       }, related
         ? this.queryStoreRelated
         : this.queryStore
@@ -39,6 +40,7 @@ class Models extends PureComponent {
     if (records !== prevRecords && !records.length) {
       this.setState({
         loading: true,
+        error: false,
       }, related
         ? this.queryStoreRelated
         : this.queryStore)

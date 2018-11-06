@@ -19,7 +19,7 @@
   "main": "dist/index.js",
   "module": "dist/index.js",
   "bin": {
-    "proton": "./src/OrbitClient/utils/createEntities.js"
+    "OrbitClient:build": "./src/OrbitClient/utils/createEntities.js"
   },
   "files": [
     "src",

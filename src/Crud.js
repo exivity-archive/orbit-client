@@ -9,23 +9,41 @@ class Crud extends PureComponent {
 
   add = async (...args) => {
     const { beforeAdd, addRecord, onAdd } = this.props
-    const proceed = await beforeAdd()
 
-    if (proceed) addRecord(...args).then(onAdd)
+    if (beforeAdd) {
+      const proceed = await beforeAdd(...args)
+      const fnArgs = proceed === true ? args : proceed
+
+      if (proceed) addRecord(...fnArgs).then(onAdd)
+    } else {
+      addRecord(...args).then(onAdd)
+    }
   }
 
   update = async (...args) => {
     const { beforeUpdate, updateRecord, onUpdate } = this.props
-    const proceed = await beforeUpdate()
 
-    if (proceed) updateRecord(...args).then(onUpdate)
+    if (beforeUpdate) {
+      const proceed = await beforeUpdate(...args)
+      const fnArgs = proceed === true ? args : proceed
+
+      if (proceed) updateRecord(...fnArgs).then(onUpdate)
+    } else {
+      updateRecord(...args).then(onUpdate)
+    }
   }
 
   remove = async (...args) => {
     const { beforeRemove, removeRecord, onRemove } = this.props
-    const proceed = await beforeRemove()
 
-    if (proceed) removeRecord(...args).then(() => onRemove(...args))
+    if (beforeRemove) {
+      const proceed = await beforeRemove(...args)
+      const fnArgs = proceed === true ? args : proceed
+
+      if (proceed) removeRecord(...fnArgs).then(onRemove)
+    } else {
+      removeRecord(...args).then(onRemove)
+    }
   }
 
   render () {
@@ -76,9 +94,6 @@ Crud.defaultProps = {
   onAdd: () => {},
   onUpdate: () => {},
   onRemove: () => {},
-  beforeAdd: () => true,
-  beforeUpdate: () => true,
-  beforeRemove: () => true
 }
 
 export default Crud

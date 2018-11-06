@@ -1,6 +1,6 @@
 {
   "name": "orbit-client",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "React client for orbitjs",
   "license": "MIT",
   "repository": {

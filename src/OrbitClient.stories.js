@@ -177,7 +177,6 @@ storiesOf('components|orbit-client', module)
           onAddCalled: true
         })}
         beforeUpdate={(prop) => {
-          console.log(prop)
           storeState({ beforeUpdateCalled: true })
           return delayBeforeTransform()
         }}
@@ -197,6 +196,7 @@ storiesOf('components|orbit-client', module)
           setTimeout(() => storeState({ planetId: undefined }), 2000)
         }}>
         {({ planet, loading, error }) => {
+          console.log(loading, error)
           if (error) return error.message
           if (loading) return 'Loading'
           return (

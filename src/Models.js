@@ -20,7 +20,9 @@ class Models extends PureComponent {
   }
 
   componentDidMount () {
-    const { [this.props.type]: records, related } = this.props
+    const { [this.props.type]: records, related, relatedTo } = this.props
+
+    if (related && !relatedTo) return null
 
     if (!records.length) {
       this.setState({
@@ -34,8 +36,10 @@ class Models extends PureComponent {
   }
 
   componentDidUpdate (prevProps) {
-    const { [this.props.type]: records, related } = this.props
+    const { [this.props.type]: records, related, relatedTo } = this.props
     const { [prevProps.type]: prevRecords } = prevProps
+
+    if (related && !relatedTo) return null
 
     if (records !== prevRecords && !records.length) {
       this.setState({

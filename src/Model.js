@@ -43,7 +43,7 @@ class Model extends PureComponent {
 
     this.state = state
   }
-
+  // @todo Add noRecord scenario when not related => return ewrror record not found
   static getDerivedStateFromProps (props, state) {
     if (!props.related) {
       const newIdProp = !!props.id && props.id !== state.idReference
@@ -225,7 +225,6 @@ class Model extends PureComponent {
     const { type, onRemove } = this.props
 
     this.setState({
-      recordReference: null,
       [type]: null,
       error: {
         message: `${type} has been removed`
@@ -236,7 +235,7 @@ class Model extends PureComponent {
   }
 
   render () {
-    const { type, children, relatedTo } = this.props
+    const { type, children, related, relatedTo } = this.props
     const { [type]: record } = this.state
     const receivedEntities = omit(this.props, [...notAllowedProps, type])
 
@@ -285,7 +284,7 @@ class Model extends PureComponent {
               {
                 [type]: extendedRecord,
                 ...receivedEntities,
-                relatedTo: relatedTo
+                relatedTo: related
                   ? relatedTo
                   : record,
                 ...queryStatus

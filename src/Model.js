@@ -270,7 +270,12 @@ class Model extends PureComponent {
             if (typeof children !== 'function') {
               return React.cloneElement(
                 this.props.children,
-                passBack
+                {
+                  ...passBack,
+                  relatedTo: related
+                    ? relatedTo
+                    : record
+                },
               )
             }
 

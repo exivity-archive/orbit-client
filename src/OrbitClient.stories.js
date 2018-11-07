@@ -176,7 +176,8 @@ storiesOf('components|orbit-client', module)
           planetId: record.id,
           onAddCalled: true
         })}
-        beforeUpdate={() => {
+        beforeUpdate={(prop) => {
+          console.log(prop)
           storeState({ beforeUpdateCalled: true })
           return delayBeforeTransform()
         }}

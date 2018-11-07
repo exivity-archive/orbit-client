@@ -8,41 +8,41 @@ class Crud extends PureComponent {
   }
 
   add = async (...args) => {
-    const { beforeAdd, addRecord, onAdd } = this.props
+    const { beforeAdd, addRecord, onAdd, onError } = this.props
 
     if (beforeAdd) {
       const proceed = await beforeAdd(...args)
       const fnArgs = proceed === true ? args : proceed
 
-      if (proceed) addRecord(...fnArgs).then(onAdd)
+      if (proceed) addRecord(...fnArgs).then(onAdd).catch(onError)
     } else {
-      addRecord(...args).then(onAdd)
+      addRecord(...args).then(onAdd).catch(onError)
     }
   }
 
   update = async (...args) => {
-    const { beforeUpdate, updateRecord, onUpdate } = this.props
+    const { beforeUpdate, updateRecord, onUpdate, onError } = this.props
 
     if (beforeUpdate) {
       const proceed = await beforeUpdate(...args)
       const fnArgs = proceed === true ? args : proceed
 
-      if (proceed) updateRecord(...fnArgs).then(onUpdate)
+      if (proceed) updateRecord(...fnArgs).then(onUpdate).catch(onError)
     } else {
-      updateRecord(...args).then(onUpdate)
+      updateRecord(...args).then(onUpdate).catch(onError)
     }
   }
 
   remove = async (...args) => {
-    const { beforeRemove, removeRecord, onRemove } = this.props
+    const { beforeRemove, removeRecord, onRemove, onError } = this.props
 
     if (beforeRemove) {
       const proceed = await beforeRemove(...args)
       const fnArgs = proceed === true ? args : proceed
 
-      if (proceed) removeRecord(...fnArgs).then(onRemove)
+      if (proceed) removeRecord(...fnArgs).then(onRemove).catch(onError)
     } else {
-      removeRecord(...args).then(onRemove)
+      removeRecord(...args).then(onRemove).catch(onError)
     }
   }
 
@@ -83,7 +83,9 @@ Crud.propTypes = {
   beforeUpdate: PropTypes.func,
   /** Callback called before remove(). Takes a promise or function.
    Return truthy value to proceed with remove() */
-  beforeRemove: PropTypes.func
+  beforeRemove: PropTypes.func,
+  /** Callback called when one of crud function catches */
+  onError: PropTypes.func,
 }
 
 Crud.defaultProps = {
@@ -94,6 +96,7 @@ Crud.defaultProps = {
   onAdd: () => {},
   onUpdate: () => {},
   onRemove: () => {},
+  onError: () => {}
 }
 
 export default Crud

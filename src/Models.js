@@ -60,7 +60,7 @@ class Models extends PureComponent {
 
   queryStoreRelated = () => {
     const { relatedTo , type } = this.props
-    this.props.queryStore(q => q.findRelatedRecords({ type: relatedTo.type, id: relatedTo.id }, type)
+    this.props.queryStore(q => q.findRelatedRecords({ type: relatedTo.type, id: relatedTo.id }, type))
       .then(() => this.setState({ loading: false }))
       .catch((error) => {
         this.setState({

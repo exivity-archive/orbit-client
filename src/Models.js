@@ -39,7 +39,7 @@ class Models extends PureComponent {
     const { [this.props.type]: records, related, relatedTo } = this.props
     const { [prevProps.type]: prevRecords } = prevProps
 
-    if (related && !relatedTo) return null
+    if (relatedTo && relatedTo.id === prevProps.relatedTo.id) return null
 
     if (records !== prevRecords && !records.length) {
       this.setState({

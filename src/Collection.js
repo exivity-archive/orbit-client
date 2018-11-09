@@ -163,9 +163,13 @@ const mapRecordsToProps = ({ type, plural, related, relatedTo, sort, filter, pag
     }
   }
 
-  return {
-    [pluralizedType]: decorateQuery(q => q.findRecords(type), { sort, filter, page }),
+  if (!related) {
+    return {
+      [pluralizedType]: decorateQuery(q => q.findRecords(type), { sort, filter, page }),
+    }
   }
+
+  return {}
 }
 
 export default withData(mapRecordsToProps)(Collection)

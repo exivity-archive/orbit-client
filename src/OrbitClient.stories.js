@@ -196,7 +196,6 @@ storiesOf('components|orbit-client', module)
           setTimeout(() => storeState({ planetId: undefined }), 2000)
         }}>
         {({ planet, loading, error }) => {
-          console.log(loading, error)
           if (error) return error.message
           if (loading) return 'Loading'
           return (

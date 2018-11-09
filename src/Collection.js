@@ -20,7 +20,8 @@ class Collection extends PureComponent {
   }
 
   componentDidMount () {
-    const { [this.props.type]: records, related, relatedTo } = this.props
+    const pluralizedType = this.props.plural || pluralize(this.props.type)
+    const { [pluralizedType]: records, related, relatedTo } = this.props
 
     if (records.length) return null
     if (related && relatedTo) this.startQuery(this.queryRelated)
@@ -28,10 +29,11 @@ class Collection extends PureComponent {
   }
 
   componentDidUpdate (prevProps) {
-    const { [this.props.type]: records, related, relatedTo } = this.props
+    const pluralizedType = this.props.plural || pluralize(this.props.type)
+    const { [pluralizedType]: records, related, relatedTo } = this.props
     const relationChanged = relatedTo && relatedTo.id === prevProps.relatedTo.id
 
-    if (!records.length && relationChanged) this.startQuery(this.queryRelated)
+    if (!records.length && related && relationChanged) this.startQuery(this.queryRelated)
   }
 
   startQuery = (query) => {
@@ -97,7 +99,8 @@ class Collection extends PureComponent {
   })
 
   render () {
-    const { [this.props.type]: records, type, relatedTo, children } = this.props
+    const pluralizedType = this.props.plural || pluralize(this.props.type)
+    const { [pluralizedType]: records, type, relatedTo, children } = this.props
     const receivedEntities = omit(this.props, [...notAllowedProps, type])
 
     const queryStatus = {
@@ -118,7 +121,7 @@ class Collection extends PureComponent {
           if (queryStatus.loading || queryStatus.error) {
             const passBack = {
               ...receivedEntities,
-              [type]: null,
+              [pluralizedType]: null,
               save: (records) => performTransforms(this.buildSaveTransforms(records)),
               remove: (records) => performTransforms(this.buildRemoveTransforms(records)),
               ...queryStatus
@@ -137,7 +140,7 @@ class Collection extends PureComponent {
 
           const passBack = {
             ...receivedEntities,
-            [type]: extendedRecords,
+            [pluralizedType]: extendedRecords,
             save: (records) => performTransforms(this.buildSaveTransforms(records)),
             remove: (records) => performTransforms(this.buildRemoveTransforms(records)),
             ...queryStatus
@@ -162,16 +165,16 @@ class Collection extends PureComponent {
 }
 
 const mapRecordsToProps = ({ type, plural, related, relatedTo, sort, filter, page }) => {
-  if (related && relatedTo) {
-    const pluralizedType = plural || pluralize(type)
+  const pluralizedType = plural || pluralize(type)
 
+  if (related && relatedTo) {
     return {
-      [type]: q => q.findRelatedRecords({ type: relatedTo.type, id: relatedTo.id }, pluralizedType),
+      [pluralizedType]: q => q.findRelatedRecords({ type: relatedTo.type, id: relatedTo.id }, pluralizedType),
     }
   }
 
   return {
-    [type]: decorateQuery(q => q.findRecords(type), { sort, filter, page }),
+    [pluralizedType]: decorateQuery(q => q.findRecords(type), { sort, filter, page }),
   }
 }
 

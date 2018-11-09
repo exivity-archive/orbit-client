@@ -253,6 +253,8 @@ class Record extends PureComponent {
             }
             : null
 
+          const relatedToRecord = record.id ? record : null
+
           if (queryStatus.loading || queryStatus.error) {
             const propsToPass = {
               [type]: null,
@@ -267,7 +269,7 @@ class Record extends PureComponent {
                   ...propsToPass,
                   relatedTo: related
                     ? relatedTo
-                    : record
+                    : relatedToRecord
                 },
               )
             }
@@ -284,7 +286,7 @@ class Record extends PureComponent {
                 ...receivedEntities,
                 relatedTo: related
                   ? relatedTo
-                  : record,
+                  : relatedToRecord,
                 ...queryStatus
               }
             )

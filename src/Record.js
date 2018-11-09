@@ -43,7 +43,7 @@ class Record extends PureComponent {
 
     this.state = state
   }
-  // @todo Add noRecord scenario when not related => return ewrror record not found
+  // @todo Add noRecord scenario when not related => return error record not found
   static getDerivedStateFromProps (props, state) {
     if (!props.related) {
       const newIdProp = !!props.id && props.id !== state.idReference
@@ -195,6 +195,7 @@ class Record extends PureComponent {
       })
   }
 
+  // @TODO refactor to use array with properties and add func to record?
   setProperty = (propertyType, property, value) => this.setState(({ [this.props.type]: record }) => ({
     [this.props.type]: {
       ...record,
@@ -213,6 +214,10 @@ class Record extends PureComponent {
     } else {
       return (value) => this.setProperty('attributes', ...args, value)
     }
+  }
+
+  resetAttributes = (attributes, value = undefined) => {
+    attributes.map(attribute => this.setProperty('attributes', attribute, value))
   }
 
   setRelationship = (...args) => {
@@ -254,6 +259,7 @@ class Record extends PureComponent {
               ...record,
               setAttribute: this.setAttribute,
               setRelationship: this.setRelationship,
+              resetAttributes: this.resetAttributes,
               save: record && !record.id
                 ? (...args) => add({...record}, ...args)
                 : (...args) => update({...record}, ...args),

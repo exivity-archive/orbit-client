@@ -255,9 +255,9 @@ class Record extends PureComponent {
               setAttribute: this.setAttribute,
               setRelationship: this.setRelationship,
               save: record && !record.id
-                ? (...args) => add(record, ...args)
-                : (...args) => update(record, ...args),
-              remove: (...args) => remove(record, ...args)
+                ? (...args) => add({...record}, ...args)
+                : (...args) => update({...record}, ...args),
+              remove: (...args) => remove({...record}, ...args)
             }
             : null
 

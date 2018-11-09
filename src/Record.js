@@ -9,7 +9,7 @@ import withCrudConsumer from './crudConsumer'
 const notAllowedProps = ['id', 'type', 'related', 'relatedTo', 'children', 'queryStore', 'updateStore',
 'buildRecord', 'addRecord', 'updateRecord', 'removeRecord', 'getRelationships']
 
-class Model extends PureComponent {
+class Record extends PureComponent {
   constructor (props) {
     super(props)
 
@@ -195,30 +195,32 @@ class Model extends PureComponent {
       })
   }
 
-  setAttribute = (attribute) => (value) => {
-    this.setState(({ [this.props.type]: record }) => ({
-      [this.props.type]: {
-        ...record,
-        attributes: {
-          ...record.attributes,
-          [attribute]: value
-        }
+  setProperty = (propertyType, property, value) => this.setState(({ [this.props.type]: record }) => ({
+    [this.props.type]: {
+      ...record,
+      [propertyType]: {
+        ...record[propertyType],
+        [property]: propertyType === 'attributes'
+          ? value
+          : { data: value }
       }
-    }))
+    }
+  }))
+
+  setAttribute = (...args) => {
+    if (args.length === 2) {
+      return () => this.setProperty('attributes', ...args)
+    } else {
+      return (value) => this.setProperty('attributes', ...args)
+    }
   }
 
-  setRelationship = (relationship) => (value) => {
-    this.setState(({ [this.props.type]: record }) => ({
-      [this.props.type]: {
-        ...record,
-        relationships: {
-          ...record.relationships,
-          [relationship]: {
-            data: value
-          }
-        }
-      }
-    }))
+  setRelationship = (...args) => {
+    if (args.length === 2) {
+      return () => this.setProperty('relationships', ...args)
+    } else {
+      return (value) => this.setProperty('relationships', ...args)
+    }
   }
 
   onRemove = (...args) => {
@@ -347,11 +349,11 @@ const mergeProps = (record, ownProps) => {
   }
 }
 
-const WithConsumer = withCrudConsumer(Model)
+const WithConsumer = withCrudConsumer(Record)
 
 export default withData(mapRecordsToProps, mergeProps)(WithConsumer)
 
-Model.propTypes = {
+Record.propTypes = {
   type: PropTypes.string,
   id: PropTypes.string,
   buildRecord: PropTypes.func,

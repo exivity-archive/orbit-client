@@ -1,2 +1,2 @@
 import React from 'react'
-import { Model, Models } from 'orbit-client'
+import { Record, Collection } from 'orbit-client'

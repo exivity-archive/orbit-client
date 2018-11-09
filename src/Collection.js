@@ -7,52 +7,42 @@ import omit from 'lodash/omit'
 import CrudContext from './CrudProvider'
 import decorateQuery from './utils/decorateQuery'
 
-const notAllowedProps = ['id', 'type', 'related', 'relatedTo', 'children', 'queryStore', 'updateStore']
+const notAllowedProps = ['id', 'type', 'related', 'relatedTo', 'children', 'queryStore', 'updateStore', 'plural']
 
-class Models extends PureComponent {
+class Collection extends PureComponent {
   constructor (props) {
     super (props)
 
     this.state = {
       loading: false,
-      error: false,
+      error: false
     }
   }
 
   componentDidMount () {
     const { [this.props.type]: records, related, relatedTo } = this.props
 
-    if (related && !relatedTo) return null
-
-    if (!records.length) {
-      this.setState({
-        loading: true,
-        error: false,
-      }, related
-        ? this.queryStoreRelated
-        : this.queryStore
-      )
-    }
+    if (records.length) return null
+    if (related && relatedTo) this.startQuery(this.queryRelated)
+    if (!related) this.startQuery(this.query)
   }
 
   componentDidUpdate (prevProps) {
     const { [this.props.type]: records, related, relatedTo } = this.props
-    const { [prevProps.type]: prevRecords } = prevProps
+    const relationChanged = relatedTo && relatedTo.id === prevProps.relatedTo.id
 
-    if (relatedTo && relatedTo.id === prevProps.relatedTo.id) return null
-
-    if (records !== prevRecords && !records.length) {
-      this.setState({
-        loading: true,
-        error: false,
-      }, related
-        ? this.queryStoreRelated
-        : this.queryStore)
-    }
+    if (!records.length && relationChanged) this.startQuery(this.queryRelated)
   }
 
-  queryStore = () => {
-    this.props.queryStore(q => q.findRecords(pluralize.singular(this.props.type)))
+  startQuery = (query) => {
+    this.setState({
+      loading: true,
+      error: false,
+    }, query)
+  }
+
+  query = () => {
+    this.props.queryStore(q => q.findRecords(this.props.type))
       .then(() => this.setState({ loading: false }))
       .catch((error) => {
         this.setState({
@@ -62,9 +52,11 @@ class Models extends PureComponent {
       })
   }
 
-  queryStoreRelated = () => {
-    const { relatedTo , type } = this.props
-    this.props.queryStore(q => q.findRelatedRecords({ type: relatedTo.type, id: relatedTo.id }, type))
+  queryRelated = () => {
+    const { relatedTo , type, plural } = this.props
+    const pluralizedType = plural || pluralize(type)
+
+    this.props.queryStore(q => q.findRelatedRecords({ type: relatedTo.type, id: relatedTo.id }, pluralizedType))
       .then(() => this.setState({ loading: false }))
       .catch((error) => {
         this.setState({
@@ -169,21 +161,23 @@ class Models extends PureComponent {
   }
 }
 
-const mapRecordsToProps = ({ type, related, relatedTo, sort, filter, page }) => {
+const mapRecordsToProps = ({ type, plural, related, relatedTo, sort, filter, page }) => {
   if (related && relatedTo) {
+    const pluralizedType = plural || pluralize(type)
+
     return {
-      [type]: q => q.findRelatedRecords({ type: relatedTo.type, id: relatedTo.id }, type),
+      [type]: q => q.findRelatedRecords({ type: relatedTo.type, id: relatedTo.id }, pluralizedType),
     }
   }
 
   return {
-    [type]: decorateQuery(q => q.findRecords(pluralize.singular(type)), { sort, filter, page }),
+    [type]: decorateQuery(q => q.findRecords(type), { sort, filter, page }),
   }
 }
 
-export default withData(mapRecordsToProps)(Models)
+export default withData(mapRecordsToProps)(Collection)
 
-Models.propTypes = {
+Collection.propTypes = {
   type: PropTypes.string,
   related: PropTypes.bool,
   queryStore: PropTypes.func,

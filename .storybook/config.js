@@ -6,10 +6,10 @@ import { withOptions } from '@storybook/addon-options'
 
 import { WithStyle } from '@exivity/ui'
 import { DataProvider } from 'react-orbitjs'
-import dataStore from './orbitStories/store'
+import dataStore from '../orbitStories/store'
 import CrudContext from '../src/CrudProvider'
 
-import schema from './orbitStories/schema'
+import schema from '../orbitStories/schema'
 
 const options = {
   name: '@exivity/orbit-client',

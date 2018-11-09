@@ -36,7 +36,9 @@
     "build:docs": "build-storybook -o docs",
     "publish:docs": "yarn build:clean && yarn build:docs && git add docs && git commit -m \"chore: update docs\" && git subtree push --prefix docs origin gh-pages",
     "prepublishOnly": "yarn lint yarn&& yarn test && yarn build",
-    "build:entities": "node ./src/orbit-client/utils/createStoryBookEntities.js"
+    "build:entities": "node ./src/orbit-client/utils/createStoryBookEntities.js",
+    "docz:dev": "docz dev",
+    "docz:build": "docz build"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.2",
@@ -55,10 +57,13 @@
     "babel-core": "^7.0.0-bridge",
     "babel-jest": "^23.6.0",
     "babel-loader": "^8.0.4",
+    "docz": "^0.12.9",
+    "docz-theme-default": "^0.12.9",
     "jest": "^23.6.0",
     "prop-types": "^15.6.2",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
+    "react-json-view": "^1.19.1",
     "react-test-renderer": "^16.5.2",
     "rimraf": "^2.6.2",
     "standard": "^12.0.1"

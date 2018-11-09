@@ -2,10 +2,10 @@ import React, { PureComponent } from 'react'
 import { storiesOf } from '@storybook/react'
 import { withState } from '../.storybook/stateDecorator'
 
-import Planet from '../.storybook/orbitStories/Planet'
-import Planets from '../.storybook/orbitStories/Planets'
-import Moons from '../.storybook/orbitStories/Moons'
-import Sun from '../.storybook/orbitStories/Sun'
+import Planet from '../orbitStories/Planet'
+import Planets from '../orbitStories/Planets'
+import Moons from '../orbitStories/Moons'
+import Sun from '../orbitStories/Sun'
 
 const jsonReplacer = function (key, val) {
   if (typeof val === 'function') {

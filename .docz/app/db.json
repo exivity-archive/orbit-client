@@ -1,0 +1,62 @@
+{
+  "config": {
+    "title": "orbit-client",
+    "description": "An expressive Reactjs client for the Orbitjs framework",
+    "themeConfig": {},
+    "menu": [],
+    "ordering": "descending",
+    "version": "0.0.12",
+    "repository": "https://github.com/exivity/orbit-client",
+    "native": false,
+    "codeSandbox": true,
+    "src": ".docz/docs",
+    "wrapper": ".docz/wrapper"
+  },
+  "entries": {
+    "collection.mdx": {
+      "id": "db34d814dcd010d2fb79136c11d55ec8",
+      "filepath": "collection.mdx",
+      "link": "https://github.com/exivity/orbit-client\\edit\\master\\.docz\\docs\\collection.mdx",
+      "slug": "collection",
+      "route": "/collection",
+      "name": "Collection",
+      "order": 0,
+      "menu": null,
+      "headings": []
+    },
+    "intro.mdx": {
+      "name": "Introduction",
+      "id": "7678080822bd6e1e7ca6819bb8804e46",
+      "filepath": "intro.mdx",
+      "link": "https://github.com/exivity/orbit-client\\edit\\master\\.docz\\docs\\intro.mdx",
+      "slug": "intro",
+      "route": "/intro",
+      "order": 0,
+      "menu": null,
+      "headings": [
+        {
+          "depth": 1,
+          "slug": "introduction",
+          "value": "Introduction"
+        }
+      ]
+    },
+    "record.mdx": {
+      "name": "Record",
+      "id": "ebf0af93cae5dc14035bfee638a8c41b",
+      "filepath": "record.mdx",
+      "link": "https://github.com/exivity/orbit-client\\edit\\master\\.docz\\docs\\record.mdx",
+      "slug": "record",
+      "route": "/record",
+      "order": 0,
+      "menu": null,
+      "headings": [
+        {
+          "depth": 1,
+          "slug": "record",
+          "value": "Record"
+        }
+      ]
+    }
+  }
+}

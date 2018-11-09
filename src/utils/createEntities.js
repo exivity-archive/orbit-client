@@ -47,8 +47,8 @@ const createComponentIndex = (models, savePath) => {
     const index = models.reduce((code, model) => {
       const entity = capitalize(model)
       const entities = pluralize(capitalize(model))
-      return code + `export const ${entity} = (props) => <Model type='${model}' {...props} />\n` +
-        `export const ${entities} = (props) => <Models type='${pluralize(model)}' {...props} />\n`
+      return code + `export const ${entity} = (props) => <Record type='${model}' {...props} />\n` +
+        `export const ${entities} = (props) => <Collection type='${pluralize(model)}' {...props} />\n`
     }, result)
 
     const path = savePath + '/index.js'

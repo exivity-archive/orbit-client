@@ -1,0 +1,17 @@
+---
+name: Record
+---
+
+# Record
+
+import { Playground, PropsTable } from 'docz'
+import Planet from '../../orbitStories/Planet'
+import Display from './Display'
+
+<PropsTable of={Planet} />
+
+<Playground>
+  <Planet id='earth'>
+    {({ planet }) => <Display object={planet}/>}
+  </Planet>
+</Playground>

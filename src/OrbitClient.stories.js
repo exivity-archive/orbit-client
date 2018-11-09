@@ -220,7 +220,6 @@ storiesOf('components|orbit-client', module)
           <Sun related>
             {(props) => {
               const { planet, moons, sun, loading, error } = props
-              console.log('render', sun)
               if (error) return error.message
               if (loading) return 'Loading'
               return (

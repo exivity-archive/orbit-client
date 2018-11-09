@@ -115,7 +115,10 @@ class Record extends PureComponent {
   constructor (props) {
     super(props)
 
-    this.state = {}
+    this.state = {
+      idReference: null,
+      recordReference: null,
+    }
   }
 
   static getDerivedStateFromProps (props, state) {

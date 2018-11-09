@@ -253,7 +253,7 @@ class Record extends PureComponent {
             }
             : null
 
-          const relatedToRecord = record.id ? record : null
+          const relatedToRecord = record && record.id ? record : null
 
           if (queryStatus.loading || queryStatus.error) {
             const propsToPass = {

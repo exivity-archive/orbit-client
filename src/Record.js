@@ -7,141 +7,119 @@ import Crud from './Crud'
 import withCrudConsumer from './crudConsumer'
 
 const notAllowedProps = ['id', 'type', 'related', 'relatedTo', 'children', 'queryStore', 'updateStore',
-'buildRecord', 'addRecord', 'updateRecord', 'removeRecord', 'getRelationships']
+'buildRecord', 'addRecord', 'updateRecord', 'removeRecord']
+
+const updateState = (props, state) => {
+  const scenarios = {
+    initializeRecord: !props.id && (props.id !== state.idReference),
+    receivedNewId: !!props.id && (props.id !== state.idReference),
+    receivedNewRecord: !!props[props.type] && (props[props.type] !== state.recordReference),
+    recordNotFoundInCache: !!props.id && !props[props.type]
+  }
+
+  if (scenarios.initializeRecord) {
+    const record = props.buildRecord(props.type)
+
+    return {
+      idReference: props.id,
+      recordReference: record,
+      [props.type]: record,
+      loading: false,
+      error: false
+    }
+  }
+
+  if (scenarios.receivedNewId) {
+    if (scenarios.recordNotFoundInCache) {
+      return {
+        idReference: props.id,
+        recordReference: null,
+        [props.type]: null,
+        loading: true,
+        error: false
+      }
+    }
+
+    return {
+      idReference: props.id,
+      recordReference: props[props.type],
+      [props.type]: props[props.type],
+      loading: false,
+      error: false
+    }
+  }
+
+  if (scenarios.receivedNewRecord) {
+    return {
+      idReference: props.id,
+      recordReference: props[props.type],
+      [props.type]: props[props.type],
+      loading: false,
+      error: false
+    }
+  }
+
+  return null
+}
+
+const updateStateRelated = (props, state) => {
+  const scenarios = {
+    noRecordToRelateTo: !props.relatedTo,
+    relatedRecordNotFoundInCache: !!props.relatedTo && !props[props.type] && !state.searchedAllSources,
+    receivedNewRelatedRecord: !!props[props.type] && (props[props.type] !== state.recordReference),
+    noRelatedRecord: !props[props.type] && state.searchedAllSources
+  }
+
+  if (scenarios.noRecordToRelateTo) {
+    return {
+      recordReference: null,
+      [props.type]: null,
+      searchedAllSources: false,
+      loading: false,
+      error: false
+    }
+  }
+
+  if (scenarios.relatedRecordNotFoundInCache) {
+    return {
+      recordReference: null,
+      [props.type]: null,
+      loading: true,
+      error: false
+    }
+  }
+
+  if (scenarios.receivedNewRelatedRecord) {
+    return {
+      recordReference: props[props.type],
+      [props.type]: props[props.type],
+      searchedAllSources: false,
+      loading: false,
+      error: false
+    }
+  }
+
+  if (scenarios.noRelatedRecord && props.required) {
+    return {
+      loading: false,
+      error: {
+        message: `Related ${props.type} has not been found while being required`
+      }
+    }
+  }
+
+  return null
+}
 
 class Record extends PureComponent {
   constructor (props) {
     super(props)
 
-    let state
-
-    if (!props.related) {
-      const recordNotFoundInCache = !!props.id && !props[props.type]
-
-      state = {
-        idReference: props.id,
-        recordReference: props[props.type],
-        [props.type]: props[props.type] || props.buildRecord(props.type),
-        loading: recordNotFoundInCache,
-        error: false
-      }
-    }
-
-    if (props.related) {
-      const relatedRecordNotFoundInCache = props.relatedTo && !props[props.type]
-      const record = relatedRecordNotFoundInCache ? null : props[props.type]
-
-      state = {
-        idReference: null,
-        recordReference: record,
-        [props.type]: record,
-        searchedAllSources: false,
-        loading: !!relatedRecordNotFoundInCache,
-        error: false
-      }
-    }
-
-    this.state = state
+    this.state = {}
   }
-  // @todo Add noRecord scenario when not related => return error record not found
+
   static getDerivedStateFromProps (props, state) {
-    if (!props.related) {
-      const newIdProp = !!props.id && props.id !== state.idReference
-      const buildRecord = !props.id && props.id !== state.idReference
-      const newRecord = !!props[props.type] && (props[props.type] !== state.recordReference)
-      const recordNotFoundInCache = props.id && !props[props.type]
-
-      if (buildRecord) {
-        const record = props.buildRecord(props.type)
-
-        return {
-          idReference: props.id,
-          recordReference: record,
-          [props.type]: record,
-          loading: false,
-          error: false
-        }
-      }
-
-      if (newIdProp) {
-        if (recordNotFoundInCache) {
-          return {
-            idReference: props.id,
-            recordReference: null,
-            [props.type]: null,
-            loading: true,
-            error: false
-          }
-        }
-
-        return {
-          idReference: props.id,
-          recordReference: props[props.type],
-          [props.type]: props[props.type],
-          loading: false,
-          error: false
-        }
-      }
-
-      if (newRecord) {
-        return {
-          idReference: props.id,
-          recordReference: props[props.type],
-          [props.type]: props[props.type],
-          loading: false,
-          error: false
-        }
-      }
-
-      return null
-    }
-
-    if (props.related) {
-      const noRecordToRelateTo = !props.relatedTo
-      const relatedRecordNotFoundInCache = props.relatedTo && !props[props.type] && !state.searchedAllSources
-      const newRelatedRecord = !!props[props.type] && (props[props.type] !== state.recordReference)
-      const noRelatedRecord = !props[props.type] && state.searchedAllSources
-
-      if (noRecordToRelateTo) {
-        return {
-          recordReference: null,
-          [props.type]: null,
-          searchedAllSources: false,
-          loading: false,
-          error: false
-        }
-      }
-
-      if (relatedRecordNotFoundInCache) {
-        return {
-          recordReference: null,
-          [props.type]: null,
-          loading: true,
-          error: false
-        }
-      }
-
-      if (newRelatedRecord) {
-        return {
-          recordReference: props[props.type],
-          [props.type]: props[props.type],
-          searchedAllSources: false,
-          loading: false,
-          error: false
-        }
-      }
-
-      if (noRelatedRecord && props.required) {
-        return {
-          loading: false,
-          error: {
-            message: `Related ${props.type} has not been found while being required`
-          }
-        }
-      }
-
-      return null
-    }
+    return props.related ? updateStateRelated(props, state) : updateState(props, state)
   }
 
   componentDidMount () {
@@ -182,10 +160,10 @@ class Record extends PureComponent {
   }
 
   queryStoreByRelation = ({ type, id }) => {
-    this.props.queryStore(q => q.findRelatedRecord({ type, id}, this.props.type))
+    this.props.queryStore(q => q.findRelatedRecord({ type, id }, this.props.type))
       .then(() => this.setState({
-          searchedAllSources: true,
-          loading: false,
+        searchedAllSources: true,
+        loading: false,
       }))
       .catch((error) => {
         this.setState({
@@ -195,37 +173,41 @@ class Record extends PureComponent {
       })
   }
 
-  // @TODO refactor to use array with properties and add func to record?
-  setProperty = (propertyType, property, value) => this.setState(({ [this.props.type]: record }) => ({
-    [this.props.type]: {
-      ...record,
-      [propertyType]: {
-        ...record[propertyType],
-        [property]: propertyType === 'attributes'
-          ? value
-          : { data: value }
-      }
-    }
-  }))
-
-  setAttribute = (...args) => {
-    if (args.length === 2) {
-      return () => this.setProperty('attributes', ...args)
+  findAndSetProperty = (path, record, value) => {
+    if (path.length === 1) {
+      record[path] = value
     } else {
-      return (value) => this.setProperty('attributes', ...args, value)
+      this.findAndSetProperty(path.slice(1), record[path[0]], value)
     }
   }
+
+  setPropertyByPath = (path, value) => {
+    const newRecord = { ...this.state[this.props.type] }
+
+    this.findAndSetProperty(path, newRecord, value)
+    this.setState({ [this.props.type]: newRecord })
+  }
+
+  setProperty = (property, ...args) => {
+    if (args.length === 2) {
+      const [nextProperty, value] = args
+      const val = property === 'relationships' ? { data: value } : value
+
+      return () => this.setPropertyByPath([property, nextProperty], val)
+    }
+
+    return (value) => {
+      const val = property === 'relationships' ? {data: value} : value
+      this.setPropertyByPath([property, ...args], val)
+    }
+  }
+
+  setAttribute = (...args) => this.setProperty('attributes', ...args)
+
+  setRelationship = (...args) => this.setProperty('relationships', ...args)
 
   resetAttributes = (attributes, value = undefined) => {
-    attributes.map(attribute => this.setProperty('attributes', attribute, value))
-  }
-
-  setRelationship = (...args) => {
-    if (args.length === 2) {
-      return () => this.setProperty('relationships', ...args)
-    } else {
-      return (value) => this.setProperty('relationships', ...args, value)
-    }
+    attributes.map(attribute => this.setPropertyByPath(['attributes', attribute], value))
   }
 
   onRemove = (...args) => {
@@ -260,6 +242,7 @@ class Record extends PureComponent {
               setAttribute: this.setAttribute,
               setRelationship: this.setRelationship,
               resetAttributes: this.resetAttributes,
+              setProperty: this.setPropertyByPath,
               save: record && !record.id
                 ? (...args) => add({...record}, ...args)
                 : (...args) => update({...record}, ...args),
@@ -268,9 +251,8 @@ class Record extends PureComponent {
             : null
 
           if (queryStatus.loading || queryStatus.error) {
-            const passBack = {
+            const propsToPass = {
               [type]: null,
-              ...receivedEntities,
               ...queryStatus
             }
 
@@ -279,7 +261,7 @@ class Record extends PureComponent {
               return React.cloneElement(
                 this.props.children,
                 {
-                  ...passBack,
+                  ...propsToPass,
                   relatedTo: related
                     ? relatedTo
                     : record
@@ -287,7 +269,7 @@ class Record extends PureComponent {
               )
             }
 
-            return children(passBack)
+            return children(propsToPass)
           }
 
           // Child is component
@@ -362,10 +344,10 @@ export default withData(mapRecordsToProps, mergeProps)(WithConsumer)
 Record.propTypes = {
   type: PropTypes.string,
   id: PropTypes.string,
-  buildRecord: PropTypes.func,
-  addRecord: PropTypes.func,
-  updateRecord: PropTypes.func,
-  removeRecord: PropTypes.func,
+  buildRecord: PropTypes.func.isRequired,
+  addRecord: PropTypes.func.isRequired,
+  updateRecord: PropTypes.func.isRequired,
+  removeRecord: PropTypes.func.isRequired,
   beforeAdd: PropTypes.func,
   onAdd: PropTypes.func,
   beforeUpdate: PropTypes.func,
@@ -373,5 +355,6 @@ Record.propTypes = {
   beforeRemove: PropTypes.func,
   onRemove: PropTypes.func,
   related: PropTypes.bool,
+  relatedTo: PropTypes.object,
   required: PropTypes.bool
 }

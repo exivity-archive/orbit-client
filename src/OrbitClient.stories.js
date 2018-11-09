@@ -62,13 +62,13 @@ const PlanetForm = ({ planet, state }) => (
     }}>
       <label>Name:</label>
       <input value={planet.attributes.name}
-        onChange={(event) => planet.setAttribute('name')(event.target.value)} />
+        onChange={(event) => planet.setAttribute('name', event.target.value)()} />
       <label>Classification:</label>
       <input value={planet.attributes.classification}
-        onChange={(event) => planet.setAttribute('classification')(event.target.value)} />
+        onChange={(event) => planet.setAttribute('classification', event.target.value)()} />
       <label>Atmosphere:</label>
       <input type='checkbox' value={planet.attributes.atmosphere}
-        onChange={(event) => planet.setAttribute('atmosphere')(event.target.checked)} />
+        onChange={(event) => planet.setAttribute('atmosphere', event.target.value)()} />
       <button onClick={event => {
         event.preventDefault()
         planet.save()
@@ -220,7 +220,7 @@ storiesOf('components|orbit-client', module)
           <Sun related>
             {(props) => {
               const { planet, moons, sun, loading, error } = props
-
+              console.log('render', sun)
               if (error) return error.message
               if (loading) return 'Loading'
               return (

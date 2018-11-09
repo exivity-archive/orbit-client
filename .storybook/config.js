@@ -47,9 +47,8 @@ const crud = {
   buildRecord: (type) => PLANET(type),
   addRecord,
   updateRecord,
-  removeRecord,
-  performTransforms: (transforms) => dataStore.update(transforms),
-  getRelationships: (model) => schema.models[model].relationships
+  removeRecord
+  // performTransforms: (transforms) => dataStore.update(transforms)
 }
 
 class Provider extends Component {

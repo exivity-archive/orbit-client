@@ -4,7 +4,6 @@ import { withData } from 'react-orbitjs'
 import pluralize from 'pluralize'
 import omit from 'lodash/omit'
 
-import CrudContext from './CrudProvider'
 import decorateQuery from './utils/decorateQuery'
 
 const notAllowedProps = ['id', 'type', 'related', 'relatedTo', 'children', 'queryStore', 'updateStore', 'plural']
@@ -13,6 +12,8 @@ class Collection extends PureComponent {
   constructor (props) {
     super (props)
 
+    this.pluralizedType = props.plural || pluralize(props.type)
+
     this.state = {
       loading: false,
       error: false
@@ -20,8 +21,7 @@ class Collection extends PureComponent {
   }
 
   componentDidMount () {
-    const pluralizedType = this.props.plural || pluralize(this.props.type)
-    const { [pluralizedType]: records, related, relatedTo } = this.props
+    const { [this.pluralizedType]: records, related, relatedTo } = this.props
 
     if (records.length) return null
     if (related && relatedTo) this.startQuery(this.queryRelated)
@@ -29,9 +29,8 @@ class Collection extends PureComponent {
   }
 
   componentDidUpdate (prevProps) {
-    const pluralizedType = this.props.plural || pluralize(this.props.type)
-    const { [pluralizedType]: records, related, relatedTo } = this.props
-    const relationChanged = relatedTo && relatedTo.id === prevProps.relatedTo.id
+    const { [this.pluralizedType]: records, related, relatedTo } = this.props
+    const relationChanged = relatedTo && relatedTo.id !== prevProps.relatedTo.id
 
     if (!records.length && related && relationChanged) this.startQuery(this.queryRelated)
   }
@@ -44,7 +43,9 @@ class Collection extends PureComponent {
   }
 
   query = () => {
-    this.props.queryStore(q => q.findRecords(this.props.type))
+    const { queryStore, type } = this.props
+
+    queryStore(q => q.findRecords(type))
       .then(() => this.setState({ loading: false }))
       .catch((error) => {
         this.setState({
@@ -55,10 +56,9 @@ class Collection extends PureComponent {
   }
 
   queryRelated = () => {
-    const { relatedTo , type, plural } = this.props
-    const pluralizedType = plural || pluralize(type)
+    const { queryStore, relatedTo } = this.props
 
-    this.props.queryStore(q => q.findRelatedRecords({ type: relatedTo.type, id: relatedTo.id }, pluralizedType))
+    queryStore(q => q.findRelatedRecords({ type: relatedTo.type, id: relatedTo.id }, this.pluralizedType))
       .then(() => this.setState({ loading: false }))
       .catch((error) => {
         this.setState({
@@ -99,8 +99,7 @@ class Collection extends PureComponent {
   })
 
   render () {
-    const pluralizedType = this.props.plural || pluralize(this.props.type)
-    const { [pluralizedType]: records, type, relatedTo, children } = this.props
+    const { [this.pluralizedType]: records, type, relatedTo, updateStore, children } = this.props
     const receivedEntities = omit(this.props, [...notAllowedProps, type])
 
     const queryStatus = {
@@ -115,59 +114,50 @@ class Collection extends PureComponent {
       all: () => records
     }
 
-    return (
-      <CrudContext.Consumer>
-        {({ performTransforms }) => {
-          if (queryStatus.loading || queryStatus.error) {
-            const passBack = {
-              ...receivedEntities,
-              [pluralizedType]: null,
-              save: (records) => performTransforms(this.buildSaveTransforms(records)),
-              remove: (records) => performTransforms(this.buildRemoveTransforms(records)),
-              ...queryStatus
-            }
+    if (queryStatus.loading || queryStatus.error) {
+      const propsToPass = {
+        [this.pluralizedType]: null,
+        ...queryStatus
+      }
 
-            if (typeof children !== 'function') {
-              // Child is component
-              return React.cloneElement(
-                children,
-                passBack
-              )
-            }
+      if (typeof children !== 'function') {
+        // Child is component
+        return React.cloneElement(
+          children,
+          propsToPass
+        )
+      }
 
-            return children(passBack)
-          }
+      return children(propsToPass)
+    }
 
-          const passBack = {
-            ...receivedEntities,
-            [pluralizedType]: extendedRecords,
-            save: (records) => performTransforms(this.buildSaveTransforms(records)),
-            remove: (records) => performTransforms(this.buildRemoveTransforms(records)),
-            ...queryStatus
-          }
+    const propsToPass = {
+      ...receivedEntities,
+      [this.pluralizedType]: extendedRecords,
+      save: (records) => updateStore(this.buildSaveTransforms(records)),
+      remove: (records) => updateStore(this.buildRemoveTransforms(records)),
+      ...queryStatus
+    }
 
-          if (typeof this.props.children !== 'function') {
-            // Child is component
-            return React.cloneElement(
-              children,
-              {
-                ...passBack,
-                relatedTo
-              }
-            )
-          }
-          // Child is a function
-          return children(passBack)
-        }}
-      </CrudContext.Consumer>
-    )
+    if (typeof this.props.children !== 'function') {
+      // Child is component
+      return React.cloneElement(
+        children,
+        {
+          ...propsToPass,
+          relatedTo
+        }
+      )
+    }
+    // Child is a function
+    return children(propsToPass)
   }
 }
 
 const mapRecordsToProps = ({ type, plural, related, relatedTo, sort, filter, page }) => {
   const pluralizedType = plural || pluralize(type)
 
-  if (related && relatedTo) {
+ if (related && relatedTo) {
     return {
       [pluralizedType]: q => q.findRelatedRecords({ type: relatedTo.type, id: relatedTo.id }, pluralizedType),
     }
@@ -182,8 +172,10 @@ export default withData(mapRecordsToProps)(Collection)
 
 Collection.propTypes = {
   type: PropTypes.string,
+  plural: PropTypes.string,
   related: PropTypes.bool,
   queryStore: PropTypes.func,
+  updateStore: PropTypes.func,
   sort: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.object

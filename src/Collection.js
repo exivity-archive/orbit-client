@@ -34,7 +34,7 @@ class Collection extends PureComponent {
     const relatedToId = relatedTo && relatedTo.id
     const relationChanged = relatedToId !== prevRelatedToId
 
-    if (!records.length && related && relationChanged) this.startQuery(this.queryRelated)
+    if (!records.length && related && relatedTo && relationChanged) this.startQuery(this.queryRelated)
   }
 
   startQuery = (query) => {

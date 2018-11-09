@@ -172,7 +172,25 @@ const mapRecordsToProps = ({ type, plural, related, relatedTo, sort, filter, pag
   return {}
 }
 
-export default withData(mapRecordsToProps)(Collection)
+// Temp workaround for react-orbitjs not being able to handle other returns then functions
+const mergeProps = (record, ownProps) => {
+  const pluralizedType = ownProps.plural || pluralize(ownProps.type)
+
+  if (ownProps.related && !ownProps.relatedTo) {
+    return {
+      ...record,
+      ...ownProps,
+      [pluralizedType]: []
+    }
+  }
+
+  return {
+    ...record,
+    ...ownProps
+  }
+}
+
+export default withData(mapRecordsToProps, mergeProps)(Collection)
 
 Collection.propTypes = {
   type: PropTypes.string,

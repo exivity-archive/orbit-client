@@ -211,7 +211,7 @@ class Record extends PureComponent {
     if (args.length === 2) {
       return () => this.setProperty('attributes', ...args)
     } else {
-      return (value) => this.setProperty('attributes', ...args)
+      return (value) => this.setProperty('attributes', ...args, value)
     }
   }
 
@@ -219,7 +219,7 @@ class Record extends PureComponent {
     if (args.length === 2) {
       return () => this.setProperty('relationships', ...args)
     } else {
-      return (value) => this.setProperty('relationships', ...args)
+      return (value) => this.setProperty('relationships', ...args, value)
     }
   }
 

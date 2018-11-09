@@ -30,7 +30,9 @@ class Collection extends PureComponent {
 
   componentDidUpdate (prevProps) {
     const { [this.pluralizedType]: records, related, relatedTo } = this.props
-    const relationChanged = relatedTo && relatedTo.id !== prevProps.relatedTo.id
+    const prevRelatedToId = prevProps.relatedTo && prevProps.relatedTo.id
+    const relatedToId = relatedTo && relatedTo.id
+    const relationChanged = relatedToId !== prevRelatedToId
 
     if (!records.length && related && relationChanged) this.startQuery(this.queryRelated)
   }

@@ -231,11 +231,11 @@ class Record extends PureComponent {
   }
 
   render () {
-    const { id, type, children, relatedTo } = this.props
+    const { type, children, relatedTo } = this.props
     const { [type]: record } = this.state
     const receivedEntities = omit(this.props, [...notAllowedProps, type])
 
-    const relatedToRecord = !relatedTo && record.id ? record : relatedTo
+    const relatedToRecord = !relatedTo && (record && record.id) ? record : relatedTo
 
     const queryStatus = {
       loading: !!this.props.loading || this.state.loading,

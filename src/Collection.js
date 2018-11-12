@@ -21,9 +21,9 @@ class Collection extends PureComponent {
   }
 
   componentDidMount () {
-    const { [this.pluralizedType]: records, related, relatedTo } = this.props
+    const { [this.pluralizedType]: records, related, relatedTo, cacheOnly } = this.props
 
-    if (records.length) return null
+    if (records.length || cacheOnly) return null
     if (related && relatedTo) this.startQuery(this.queryRelated)
     if (!related) this.startQuery(this.query)
   }
@@ -193,6 +193,7 @@ Collection.propTypes = {
   type: PropTypes.string,
   plural: PropTypes.string,
   related: PropTypes.bool,
+  cacheOnly: PropTypes.bool,
   queryStore: PropTypes.func,
   updateStore: PropTypes.func,
   sort: PropTypes.oneOfType([

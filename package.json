@@ -1,18 +1,17 @@
 {
   "name": "orbit-client",
-  "version": "0.0.30",
-    "description": "React client for orbitjs",
-    "license": "MIT",
-    "repository": {
-      "type": "git",
-      "url": "https://github.com/exivity/orbit-client.git"
-    },
-    "keywords": [
-      "exivity",
-      "orbit-client"
-    ],
-    "author": "Michiel de Vos <Michiel_87@hotmail.com>",
-    "bugs": {
+  "version": "0.0.31",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/exivity/orbit-client.git"
+  },
+  "keywords": [
+    "exivity",
+    "orbit-client"
+  ],
+  "author": "Michiel de Vos <Michiel_87@hotmail.com>",
+  "bugs": {
     "url": "https://github.com/exivity/orbit-client/issues"
   },
   "homepage": "https://github.com/exivity/orbit-client",
@@ -28,6 +27,7 @@
   "scripts": {
     "lint": "standard src",
     "lint:fix": "standard src --fix",
+    "description": "React client for orbitjs",
     "test": "jest || true",
     "start": "start-storybook -p 6007",
     "build": "yarn build:clean && yarn build:dist && yarn build:docs",

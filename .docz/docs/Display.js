@@ -1,10 +1,10 @@
 import React from 'react'
 import ReactJson from 'react-json-view'
 
-const Display = ({ object }) => (
-  <ReactJson name={object.type} src={object}
+const Display = ({ name, object, collapsed }) => (
+  <ReactJson name={name || object.type} src={object} collapsed={collapsed}
     shouldCollapse={(field) => {
-        return ['attributes', 'relationships'].includes(field.name)}
+        return ['planet', 'attributes', 'relationships', '0' , '1' , '2'].includes(field.name)}
     }/>
 )
 

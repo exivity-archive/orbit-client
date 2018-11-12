@@ -1,14 +1,13 @@
 ---
-name: Introduction
-route: /
+name: Getting started
 ---
 
 import { Playground, PropsTable } from 'docz'
 import Planet from '../../orbitStories/Planet'
 import Display from './Display'
-import Preview from './Preview'
+import { Link } from 'docz'
 
-# Introduction
+## Getting Started
 
 Orbit-client is a declarative React client for Orbitjs.
 
@@ -16,15 +15,3 @@ Orbit is a framework for orchestrating access, transformation, and synchronizati
 Visit https://orbitjs.com/ for more information.
 
 Orbit-client enables you to request, transform and render your data effortlessly.
-
-<Preview>
-  <Planet id='earth'>
-    {({ planet, loading, error }) => <Display name='client' object={{ planet, loading, error }} />}
-  </Planet>
-</Preview>
-
-<Playground>
-  <Planet id='earth'>
-    {({ planet, loading, error }) => <Display name='client' object={{ planet, loading, error }} />}
-  </Planet>
-</Playground>

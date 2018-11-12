@@ -5,7 +5,7 @@
     "themeConfig": {},
     "menu": [],
     "ordering": "descending",
-    "version": "0.0.12",
+    "version": "0.0.27",
     "repository": "https://github.com/exivity/orbit-client",
     "native": false,
     "codeSandbox": true,
@@ -14,23 +14,46 @@
   },
   "entries": {
     "collection.mdx": {
+      "name": "Collection",
+      "menu": "Components",
       "id": "db34d814dcd010d2fb79136c11d55ec8",
       "filepath": "collection.mdx",
       "link": "https://github.com/exivity/orbit-client\\edit\\master\\.docz\\docs\\collection.mdx",
       "slug": "collection",
       "route": "/collection",
-      "name": "Collection",
+      "order": 0,
+      "headings": [
+        {
+          "depth": 1,
+          "slug": "collection",
+          "value": "Collection"
+        }
+      ]
+    },
+    "gettingStarted.mdx": {
+      "name": "Getting started",
+      "id": "e8eb7452b9e9207c9d4a874aa1bdeb66",
+      "filepath": "gettingStarted.mdx",
+      "link": "https://github.com/exivity/orbit-client\\edit\\master\\.docz\\docs\\gettingStarted.mdx",
+      "slug": "getting-started",
+      "route": "/getting-started",
       "order": 0,
       "menu": null,
-      "headings": []
+      "headings": [
+        {
+          "depth": 2,
+          "slug": "getting-started",
+          "value": "Getting Started"
+        }
+      ]
     },
     "intro.mdx": {
       "name": "Introduction",
+      "route": "/",
       "id": "7678080822bd6e1e7ca6819bb8804e46",
       "filepath": "intro.mdx",
       "link": "https://github.com/exivity/orbit-client\\edit\\master\\.docz\\docs\\intro.mdx",
       "slug": "intro",
-      "route": "/intro",
       "order": 0,
       "menu": null,
       "headings": [
@@ -43,18 +66,23 @@
     },
     "record.mdx": {
       "name": "Record",
+      "menu": "Components",
       "id": "ebf0af93cae5dc14035bfee638a8c41b",
       "filepath": "record.mdx",
       "link": "https://github.com/exivity/orbit-client\\edit\\master\\.docz\\docs\\record.mdx",
       "slug": "record",
       "route": "/record",
       "order": 0,
-      "menu": null,
       "headings": [
         {
           "depth": 1,
           "slug": "record",
           "value": "Record"
+        },
+        {
+          "depth": 2,
+          "slug": "basic-usage",
+          "value": "Basic usage"
         }
       ]
     }

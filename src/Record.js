@@ -126,8 +126,10 @@ class Record extends PureComponent {
   }
 
   componentDidMount () {
-    const { id, related, relatedTo } = this.props
+    const { id, related, relatedTo, cacheOnly } = this.props
     const { loading } = this.state
+
+    if (cacheOnly) return null
 
     if (loading) {
       if (related && relatedTo) {
@@ -139,8 +141,10 @@ class Record extends PureComponent {
   }
 
   componentDidUpdate () {
-    const { id, related, relatedTo } = this.props
+    const { id, related, relatedTo, cacheOnly } = this.props
     const { loading } = this.state
+
+    if (cacheOnly) return null
 
     if (loading) {
       if (related && relatedTo) {
@@ -227,9 +231,11 @@ class Record extends PureComponent {
   }
 
   render () {
-    const { type, children, related, relatedTo } = this.props
+    const { id, type, children, relatedTo } = this.props
     const { [type]: record } = this.state
     const receivedEntities = omit(this.props, [...notAllowedProps, type])
+
+    const relatedToRecord = !relatedTo && record.id ? record : relatedTo
 
     const queryStatus = {
       loading: !!this.props.loading || this.state.loading,
@@ -253,8 +259,6 @@ class Record extends PureComponent {
             }
             : null
 
-          const relatedToRecord = record && record.id ? record : null
-
           if (queryStatus.loading || queryStatus.error) {
             const propsToPass = {
               [type]: null,
@@ -263,15 +267,24 @@ class Record extends PureComponent {
 
             // Child is component
             if (typeof children !== 'function') {
-              return React.cloneElement(
-                this.props.children,
-                {
-                  ...propsToPass,
-                  relatedTo: related
-                    ? relatedTo
-                    : relatedToRecord
-                },
-              )
+              if (children.type.displayName === 'Collection') {
+                return React.cloneElement(
+                  this.props.children,
+                  {
+                    key: `${type}-relatedTo-${relatedTo && relatedTo.id}`,
+                    ...propsToPass,
+                    relatedTo: relatedToRecord
+                  },
+                )
+              } else {
+                return React.cloneElement(
+                  this.props.children,
+                  {
+                    ...propsToPass,
+                    relatedTo: relatedToRecord
+                  },
+                )
+              }
             }
 
             return children(propsToPass)
@@ -279,17 +292,28 @@ class Record extends PureComponent {
 
           // Child is component
           if (typeof children !== 'function') {
-            return React.cloneElement(
-              this.props.children,
-              {
-                [type]: extendedRecord,
-                ...receivedEntities,
-                relatedTo: related
-                  ? relatedTo
-                  : relatedToRecord,
-                ...queryStatus
-              }
-            )
+            if (children.type.displayName === 'Collection') {
+              return React.cloneElement(
+                this.props.children,
+                {
+                  key: `${type}-relatedTo-${relatedTo && relatedTo.id}`,
+                  [type]: extendedRecord,
+                  ...receivedEntities,
+                  relatedTo: relatedToRecord,
+                  ...queryStatus
+                }
+              )
+            } else {
+              return React.cloneElement(
+                this.props.children,
+                {
+                  [type]: extendedRecord,
+                  ...receivedEntities,
+                  relatedTo: relatedToRecord,
+                  ...queryStatus
+                }
+              )
+            }
           }
 
           // Child is a function - Provide record and status in callback
@@ -342,13 +366,20 @@ const mergeProps = (record, ownProps) => {
   }
 }
 
+export { Record }
+
 const WithConsumer = withCrudConsumer(Record)
 
 export default withData(mapRecordsToProps, mergeProps)(WithConsumer)
 
+Record.defaultProps = {
+  relatedTo: null,
+}
+
 Record.propTypes = {
   type: PropTypes.string,
   id: PropTypes.string,
+  cacheOnly: PropTypes.bool,
   buildRecord: PropTypes.func.isRequired,
   addRecord: PropTypes.func.isRequired,
   updateRecord: PropTypes.func.isRequired,

@@ -28,15 +28,6 @@ class Collection extends PureComponent {
     if (!related) this.startQuery(this.query)
   }
 
-  componentDidUpdate (prevProps) {
-    const { [this.pluralizedType]: records, related, relatedTo } = this.props
-    const prevRelatedToId = prevProps.relatedTo && prevProps.relatedTo.id
-    const relatedToId = relatedTo && relatedTo.id
-    const relationChanged = relatedToId !== prevRelatedToId
-
-    if (!records.length && related && relatedTo && relationChanged) this.startQuery(this.queryRelated)
-  }
-
   startQuery = (query) => {
     this.setState({
       loading: true,
@@ -192,7 +183,11 @@ const mergeProps = (record, ownProps) => {
   }
 }
 
+export { Collection }
+
 export default withData(mapRecordsToProps, mergeProps)(Collection)
+
+Collection.displayName = 'Collection'
 
 Collection.propTypes = {
   type: PropTypes.string,

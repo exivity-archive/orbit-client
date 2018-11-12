@@ -1,0 +1,19 @@
+---
+name: Collection
+menu: Components
+---
+
+# Collection
+
+import { Playground, PropsTable } from 'docz'
+import Planets from '../../orbitStories/Planets'
+import { Collection } from '../../src/Collection'
+import Display from './Display'
+
+<Playground>
+  <Planets>
+    {({ planets }) => <Display name='planets' object={planets.all()}/>}
+  </Planets>
+</Playground>
+
+<PropsTable of={Collection} />

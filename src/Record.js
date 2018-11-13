@@ -15,7 +15,7 @@ const updateState = (props, state) => {
     receivedNewId: !!props.id && (props.id !== state.idReference),
     receivedNewRecord: !!props[props.type] && (props[props.type] !== state.recordReference),
     recordNotFoundInCache: !!props.id && !props[props.type],
-    cacheOnly: props.cacheOnly
+    cacheOnly: props.cache === 'only'
   }
 
   if (scenarios.initializeRecord) {
@@ -69,7 +69,7 @@ const updateStateRelated = (props, state) => {
     relatedRecordNotFoundInCache: !!props.relatedTo && !props[props.type] && !state.searchedAllSources,
     receivedNewRelatedRecord: !!props[props.type] && (props[props.type] !== state.recordReference),
     noRelatedRecord: !props[props.type] && state.searchedAllSources,
-    cacheOnly: props.cacheOnly
+    cacheOnly: props.cache === 'only'
   }
 
   if (scenarios.noRecordToRelateTo) {
@@ -326,13 +326,17 @@ class Record extends PureComponent {
   }
 }
 
-const mapRecordsToProps = ({ id, type, related, relatedTo }) => {
-  if (related && relatedTo) {
-    return { [type]: q => q.findRelatedRecord({ type: relatedTo.type, id: relatedTo.id }, type) }
+const mapRecordsToProps = ({ id, type, related, relatedTo, cache }) => {
+  if (cache === 'skip') {
+    return {}
   }
 
   if (id) {
     return { [type]: q => q.findRecord({ type, id }) }
+  }
+
+  if (related && relatedTo) {
+    return { [type]: q => q.findRelatedRecord({ type: relatedTo.type, id: relatedTo.id }, type) }
   }
 
   return {}
@@ -372,12 +376,17 @@ export default withData(mapRecordsToProps, mergeProps)(WithConsumer)
 
 Record.defaultProps = {
   relatedTo: null,
+  cache: 'auto',
 }
 
 Record.propTypes = {
   type: PropTypes.string,
   id: PropTypes.string,
-  cacheOnly: PropTypes.bool,
+  cache: PropTypes.oneOf([
+    'only',
+    'skip',
+    'auto'
+  ]),
   buildRecord: PropTypes.func.isRequired,
   addRecord: PropTypes.func.isRequired,
   updateRecord: PropTypes.func.isRequired,

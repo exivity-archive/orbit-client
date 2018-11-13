@@ -21,9 +21,9 @@ class Collection extends PureComponent {
   }
 
   componentDidMount () {
-    const { [this.pluralizedType]: records, related, relatedTo, cacheOnly } = this.props
+    const { related, relatedTo, cache } = this.props
 
-    if (records.length || cacheOnly) return null
+    if (cache === 'only') return null
     if (related && relatedTo) this.startQuery(this.queryRelated)
     if (!related) this.startQuery(this.query)
   }
@@ -147,8 +147,12 @@ class Collection extends PureComponent {
   }
 }
 
-const mapRecordsToProps = ({ type, plural, related, relatedTo, sort, filter, page }) => {
+const mapRecordsToProps = ({ type, plural, cache, related, relatedTo, sort, filter, page }) => {
   const pluralizedType = plural || pluralize(type)
+
+  if (cache === 'skip') {
+    return {}
+  }
 
  if (related && relatedTo) {
     return {
@@ -189,11 +193,18 @@ export default withData(mapRecordsToProps, mergeProps)(Collection)
 
 Collection.displayName = 'Collection'
 
+Collection.defaultProps = {
+  cache: 'skip',
+}
+
 Collection.propTypes = {
   type: PropTypes.string,
   plural: PropTypes.string,
   related: PropTypes.bool,
-  cacheOnly: PropTypes.bool,
+  cache: PropTypes.oneOf([
+    'only',
+    'skip'
+  ]),
   queryStore: PropTypes.func,
   updateStore: PropTypes.func,
   sort: PropTypes.oneOfType([

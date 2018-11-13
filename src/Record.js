@@ -215,26 +215,28 @@ class Record extends PureComponent {
     attributes.map(attribute => this.setPropertyByPath(['attributes', attribute], value))
   }
 
-  beforeRemove = async (...args) => {
+  beforeRemove = (...args) => {
     const { beforeRemove } = this.props
 
-    if (beforeRemove) {
-      const proceed = await beforeRemove(...args)
+    return new Promise(async (resolve) => {
+      if (beforeRemove) {
+        const proceed = await beforeRemove(...args)
 
-      if (proceed) {
+        if (proceed) {
+          this.setState({
+            loading: true
+          })
+        }
+
+        resolve(proceed)
+      } else {
         this.setState({
           loading: true
         })
+
+        resolve(true)
       }
-
-      return proceed
-    }
-
-    this.setState({
-      loading: true
     })
-
-    return true
   }
 
   onRemove = (...args) => {

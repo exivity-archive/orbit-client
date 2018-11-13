@@ -240,14 +240,9 @@ class Record extends PureComponent {
   }
 
   onRemove = (...args) => {
-    const { type, onRemove } = this.props
+    const { onRemove } = this.props
 
     onRemove && onRemove(...args)
-
-    this.setState({
-      [type]: null,
-      loading: false,
-    })
   }
 
   onError = (error) => {

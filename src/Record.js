@@ -14,7 +14,8 @@ const updateState = (props, state) => {
     initializeRecord: !props.id && (props.id !== state.idReference),
     receivedNewId: !!props.id && (props.id !== state.idReference),
     receivedNewRecord: !!props[props.type] && (props[props.type] !== state.recordReference),
-    recordNotFoundInCache: !!props.id && !props[props.type]
+    recordNotFoundInCache: !!props.id && !props[props.type],
+    cacheOnly: props.cacheOnly
   }
 
   if (scenarios.initializeRecord) {
@@ -35,7 +36,7 @@ const updateState = (props, state) => {
         idReference: props.id,
         recordReference: null,
         [props.type]: null,
-        loading: true,
+        loading: !scenarios.cacheOnly,
         error: false
       }
     }
@@ -67,7 +68,8 @@ const updateStateRelated = (props, state) => {
     noRecordToRelateTo: !props.relatedTo,
     relatedRecordNotFoundInCache: !!props.relatedTo && !props[props.type] && !state.searchedAllSources,
     receivedNewRelatedRecord: !!props[props.type] && (props[props.type] !== state.recordReference),
-    noRelatedRecord: !props[props.type] && state.searchedAllSources
+    noRelatedRecord: !props[props.type] && state.searchedAllSources,
+    cacheOnly: props.cacheOnly
   }
 
   if (scenarios.noRecordToRelateTo) {
@@ -84,7 +86,7 @@ const updateStateRelated = (props, state) => {
     return {
       recordReference: null,
       [props.type]: null,
-      loading: true,
+      loading: !scenarios.cacheOnly,
       error: false
     }
   }
@@ -126,10 +128,8 @@ class Record extends PureComponent {
   }
 
   componentDidMount () {
-    const { id, related, relatedTo, cacheOnly } = this.props
+    const { id, related, relatedTo } = this.props
     const { loading } = this.state
-
-    if (cacheOnly) return null
 
     if (loading) {
       if (related && relatedTo) {
@@ -141,10 +141,8 @@ class Record extends PureComponent {
   }
 
   componentDidUpdate () {
-    const { id, related, relatedTo, cacheOnly } = this.props
+    const { id, related, relatedTo } = this.props
     const { loading } = this.state
-
-    if (cacheOnly) return null
 
     if (loading) {
       if (related && relatedTo) {
@@ -204,7 +202,7 @@ class Record extends PureComponent {
     }
 
     return (value) => {
-      const val = property === 'relationships' ? {data: value} : value
+      const val = property === 'relationships' ? { data: value } : value
       this.setPropertyByPath([property, ...args], val)
     }
   }

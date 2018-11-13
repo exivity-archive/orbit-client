@@ -5,12 +5,15 @@
     "themeConfig": {},
     "menu": [],
     "ordering": "descending",
-    "version": "0.0.27",
+    "version": "0.0.31",
     "repository": "https://github.com/exivity/orbit-client",
     "native": false,
     "codeSandbox": true,
     "src": ".docz/docs",
-    "wrapper": ".docz/wrapper"
+    "wrapper": ".docz/wrapper",
+    "plugins": [
+      {}
+    ]
   },
   "entries": {
     "collection.mdx": {
@@ -32,12 +35,12 @@
     },
     "gettingStarted.mdx": {
       "name": "Getting started",
+      "order": 2,
       "id": "e8eb7452b9e9207c9d4a874aa1bdeb66",
       "filepath": "gettingStarted.mdx",
       "link": "https://github.com/exivity/orbit-client\\edit\\master\\.docz\\docs\\gettingStarted.mdx",
       "slug": "getting-started",
       "route": "/getting-started",
-      "order": 0,
       "menu": null,
       "headings": [
         {
@@ -49,12 +52,12 @@
     },
     "intro.mdx": {
       "name": "Introduction",
+      "order": 1,
       "route": "/",
       "id": "7678080822bd6e1e7ca6819bb8804e46",
       "filepath": "intro.mdx",
       "link": "https://github.com/exivity/orbit-client\\edit\\master\\.docz\\docs\\intro.mdx",
       "slug": "intro",
-      "order": 0,
       "menu": null,
       "headings": [
         {

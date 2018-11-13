@@ -222,15 +222,19 @@ class Record extends PureComponent {
       const proceed = await beforeRemove(...args)
 
       if (proceed) {
-        return this.setState({
+        this.setState({
           loading: true
         })
       }
+
+      return proceed
     }
 
     this.setState({
       loading: true
     })
+
+    return true
   }
 
   onRemove = (...args) => {

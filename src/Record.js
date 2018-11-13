@@ -224,14 +224,14 @@ class Record extends PureComponent {
 
         if (proceed) {
           this.setState({
-            loading: true
+            loadingTransform: true
           })
         }
 
         resolve(proceed)
       } else {
         this.setState({
-          loading: true
+          loadingTransform: true
         })
 
         resolve(true)
@@ -249,7 +249,7 @@ class Record extends PureComponent {
     const { onError } = this.props
 
     this.setState({
-      loading: false,
+      loadingTransform: false,
     })
 
     onError && onError(error)
@@ -263,7 +263,7 @@ class Record extends PureComponent {
     const relatedToRecord = !relatedTo && (record && record.id) ? record : relatedTo
 
     const queryStatus = {
-      loading: !!this.props.loading || this.state.loading,
+      loading: !!this.props.loading || this.state.loading || this.state.loadingTransform,
       error: this.props.error || this.state.error
     }
 

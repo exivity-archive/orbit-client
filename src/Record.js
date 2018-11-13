@@ -215,17 +215,43 @@ class Record extends PureComponent {
     attributes.map(attribute => this.setPropertyByPath(['attributes', attribute], value))
   }
 
+  beforeRemove = async (...args) => {
+    const { beforeRemove } = this.props
+
+    if (beforeRemove) {
+      const proceed = await beforeRemove(...args)
+
+      if (proceed) {
+        return this.setState({
+          loading: true
+        })
+      }
+    }
+
+    this.setState({
+      loading: true
+    })
+  }
+
   onRemove = (...args) => {
     const { type, onRemove } = this.props
 
     this.setState({
       [type]: null,
-      error: {
-        message: `${type} has been removed`
-      }
+      loading: false,
     })
 
     onRemove && onRemove(...args)
+  }
+
+  onError = (error) => {
+    const { onError } = this.props
+
+    this.setState({
+      loading: false,
+    })
+
+    onError && onError(error)
   }
 
   render () {
@@ -241,7 +267,7 @@ class Record extends PureComponent {
     }
 
     return (
-      <Crud {...this.props} onRemove={this.onRemove}>
+      <Crud {...this.props} beforeRemove={this.beforeRemove} onRemove={this.onRemove} onError={this.onError}>
         {({ add, update, remove }) => {
           const extendedRecord = record
             ?  {

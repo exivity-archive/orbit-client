@@ -6,7 +6,8 @@ import omit from 'lodash/omit'
 
 import decorateQuery from './utils/decorateQuery'
 
-const notAllowedProps = ['id', 'type', 'related', 'relatedTo', 'children', 'queryStore', 'updateStore', 'plural']
+const notAllowedProps = ['id', 'type', 'related', 'relatedTo', 'children', 'queryStore', 'updateStore', 'plural',
+  'cache']
 
 class Collection extends PureComponent {
   constructor (props) {

@@ -7,7 +7,7 @@ import Crud from './Crud'
 import withCrudConsumer from './crudConsumer'
 
 const notAllowedProps = ['id', 'type', 'related', 'relatedTo', 'children', 'queryStore', 'updateStore',
-'buildRecord', 'addRecord', 'updateRecord', 'removeRecord']
+'buildRecord', 'addRecord', 'updateRecord', 'removeRecord', 'cache']
 
 const updateState = (props, state) => {
   const scenarios = {

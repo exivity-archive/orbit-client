@@ -37,124 +37,124 @@ class Collection extends PureComponent {
     }, query)
   }
 
-  query = () => {
-    const { queryStore, type } = this.props
+    query = () => {
+      const { queryStore, type } = this.props
 
-    queryStore(q => q.findRecords(type))
-      .then((fetchedCollection) => this.setState({
-        fetchedCollection,
-        loading: false
-      }))
-      .catch((error) => {
-        this.setState({
-          loading: false,
-          error
-        })
-      })
-  }
-
-  queryRelated = () => {
-    const { queryStore, relatedTo } = this.props
-
-    queryStore(q => q.findRelatedRecords({ type: relatedTo.type, id: relatedTo.id }, this.pluralizedType))
-      .then((fetchedCollection) => {
-        this.setState({
+      queryStore(q => q.findRecords(type))
+        .then((fetchedCollection) => this.setState({
           fetchedCollection,
           loading: false
+        }))
+        .catch((error) => {
+          this.setState({
+            loading: false,
+            error
+          })
         })
-      })
-      .catch((error) => {
-        this.setState({
-          loading: false,
-          error
+    }
+
+    queryRelated = () => {
+      const { queryStore, relatedTo } = this.props
+
+      queryStore(q => q.findRelatedRecords({ type: relatedTo.type, id: relatedTo.id }, this.pluralizedType))
+        .then((fetchedCollection) => {
+          this.setState({
+            fetchedCollection,
+            loading: false
+          })
         })
-      })
-  }
-
-  findOne = (id) => {
-    const { [this.props.type]: collection } = this.props
-
-    return collection.find(item => item.id === id)
-  }
-
-  find = (ids) => {
-    const { [this.props.type]: collection } = this.props
-
-    return ids.map(id => collection.find(item => item.id === id))
-  }
-
-  findByAttribute = ({ attribute, value }) => {
-    const { [this.props.type]: collection } = this.props
-
-    return collection.filter(item => item.attributes[attribute] === value)
-  }
-
-  buildSaveTransforms = (collection) => (t) => collection.map((record) => {
-    if (record.id) {
-      return t.replaceRecord(record)
+        .catch((error) => {
+          this.setState({
+            loading: false,
+            error
+          })
+        })
     }
 
-    return t.addRecord(record)
-  })
+    findOne = (id) => {
+      const { [this.props.type]: collection } = this.props
 
-  buildRemoveTransforms = (collection) => (t) => collection.map((record) => {
-    return t.removeRecord(record)
-  })
-
-  render () {
-    const { [this.pluralizedType]: collection, type, relatedTo, updateStore, cache, children } = this.props
-    const receivedEntities = omit(this.props, [...notAllowedProps, type])
-
-    const queryStatus = {
-      loading: !!this.props.loading || this.state.loading,
-      error: this.props.error || this.state.error
+      return collection.find(item => item.id === id)
     }
 
-    const extendedCollection = {
-      findOne: this.findOne,
-      find: this.find,
-      findByAttribute: this.findByAttribute,
-      all: () => cache === 'only' ? collection : this.state.fetchedCollection
+    find = (ids) => {
+      const { [this.props.type]: collection } = this.props
+
+      return ids.map(id => collection.find(item => item.id === id))
     }
 
-    if (queryStatus.loading || queryStatus.error) {
-      const propsToPass = {
-        [this.pluralizedType]: null,
-        ...queryStatus
+    findByAttribute = ({ attribute, value }) => {
+      const { [this.props.type]: collection } = this.props
+
+      return collection.filter(item => item.attributes[attribute] === value)
+    }
+
+    buildSaveTransforms = (collection) => (t) => collection.map((record) => {
+      if (record.id) {
+        return t.replaceRecord(record)
       }
 
-      if (typeof children !== 'function') {
-        // Child is component
-        return React.cloneElement(
-          children,
-          propsToPass
-        )
+      return t.addRecord(record)
+    })
+
+    buildRemoveTransforms = (collection) => (t) => collection.map((record) => {
+      return t.removeRecord(record)
+    })
+
+    render () {
+      const { [this.pluralizedType]: collection, type, relatedTo, updateStore, cache, children } = this.props
+      const receivedEntities = omit(this.props, [...notAllowedProps, type])
+
+      const queryStatus = {
+        loading: !!this.props.loading || this.state.loading,
+        error: this.props.error || this.state.error
       }
 
-      return children(propsToPass)
-    }
+      const extendedCollection = {
+        findOne: this.findOne,
+        find: this.find,
+        findByAttribute: this.findByAttribute,
+        all: () => cache === 'only' ? collection : this.state.fetchedCollection
+      }
 
-    const propsToPass = {
-      ...receivedEntities,
-      [this.pluralizedType]: extendedCollection,
-      save: (collection) => updateStore(this.buildSaveTransforms(collection)),
-      remove: (collection) => updateStore(this.buildRemoveTransforms(collection)),
-      ...queryStatus
-    }
-
-    if (typeof this.props.children !== 'function') {
-      // Child is component
-      return React.cloneElement(
-        children,
-        {
-          ...propsToPass,
-          relatedTo
-        }
-      )
-    }
-    // Child is a function
-    return children(propsToPass)
+      if (queryStatus.loading || queryStatus.error) {
+  const propsToPass = {
+    [this.pluralizedType]: null,
+    ...queryStatus
   }
+
+  if (typeof children !== 'function') {
+    // Child is component
+    return React.cloneElement(
+      children,
+      propsToPass
+    )
+  }
+
+  return children(propsToPass)
+}
+
+const propsToPass = {
+  ...receivedEntities,
+  [this.pluralizedType]: extendedCollection,
+  save: (collection) => updateStore(this.buildSaveTransforms(collection)),
+  remove: (collection) => updateStore(this.buildRemoveTransforms(collection)),
+  ...queryStatus
+}
+
+if (typeof this.props.children !== 'function') {
+  // Child is component
+  return React.cloneElement(
+    children,
+    {
+      ...propsToPass,
+      relatedTo
+    }
+  )
+}
+// Child is a function
+return children(propsToPass)
+}
 }
 
 const mapRecordsToProps = ({ type, plural, cache, related, relatedTo, sort, filter, page }) => {
@@ -164,7 +164,7 @@ const mapRecordsToProps = ({ type, plural, cache, related, relatedTo, sort, filt
     return {}
   }
 
- if (related && relatedTo) {
+  if (related && relatedTo) {
     return {
       [pluralizedType]: q => q.findRelatedRecords({ type: relatedTo.type, id: relatedTo.id }, pluralizedType),
     }

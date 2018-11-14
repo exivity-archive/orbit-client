@@ -16,6 +16,7 @@ class Collection extends PureComponent {
     this.pluralizedType = props.plural || pluralize(props.type)
 
     this.state = {
+      fetchedCollection: [],
       loading: false,
       error: false
     }
@@ -40,7 +41,10 @@ class Collection extends PureComponent {
     const { queryStore, type } = this.props
 
     queryStore(q => q.findRecords(type))
-      .then(() => this.setState({ loading: false }))
+      .then((fetchedCollection) => this.setState({
+        fetchedCollection,
+        loading: false
+      }))
       .catch((error) => {
         this.setState({
           loading: false,
@@ -53,7 +57,12 @@ class Collection extends PureComponent {
     const { queryStore, relatedTo } = this.props
 
     queryStore(q => q.findRelatedRecords({ type: relatedTo.type, id: relatedTo.id }, this.pluralizedType))
-      .then(() => this.setState({ loading: false }))
+      .then((fetchedCollection) => {
+        this.setState({
+          fetchedCollection,
+          loading: false
+        })
+      })
       .catch((error) => {
         this.setState({
           loading: false,
@@ -63,24 +72,24 @@ class Collection extends PureComponent {
   }
 
   findOne = (id) => {
-    const { [this.props.type]: records } = this.props
+    const { [this.props.type]: collection } = this.props
 
-    return records.find(item => item.id === id)
+    return collection.find(item => item.id === id)
   }
 
   find = (ids) => {
-    const { [this.props.type]: records } = this.props
+    const { [this.props.type]: collection } = this.props
 
-    return ids.map(id => records.find(item => item.id === id))
+    return ids.map(id => collection.find(item => item.id === id))
   }
 
   findByAttribute = ({ attribute, value }) => {
-    const { [this.props.type]: records } = this.props
+    const { [this.props.type]: collection } = this.props
 
-    return records.filter(item => item.attributes[attribute] === value)
+    return collection.filter(item => item.attributes[attribute] === value)
   }
 
-  buildSaveTransforms = (records) => (t) => records.map((record) => {
+  buildSaveTransforms = (collection) => (t) => collection.map((record) => {
     if (record.id) {
       return t.replaceRecord(record)
     }
@@ -88,12 +97,12 @@ class Collection extends PureComponent {
     return t.addRecord(record)
   })
 
-  buildRemoveTransforms = (records) => (t) => records.map((record) => {
+  buildRemoveTransforms = (collection) => (t) => collection.map((record) => {
     return t.removeRecord(record)
   })
 
   render () {
-    const { [this.pluralizedType]: records, type, relatedTo, updateStore, children } = this.props
+    const { [this.pluralizedType]: collection, type, relatedTo, updateStore, cache, children } = this.props
     const receivedEntities = omit(this.props, [...notAllowedProps, type])
 
     const queryStatus = {
@@ -101,11 +110,11 @@ class Collection extends PureComponent {
       error: this.props.error || this.state.error
     }
 
-    const extendedRecords = {
+    const extendedCollection = {
       findOne: this.findOne,
       find: this.find,
       findByAttribute: this.findByAttribute,
-      all: () => records
+      all: () => cache === 'only' ? collection : this.state.fetchedCollection
     }
 
     if (queryStatus.loading || queryStatus.error) {
@@ -127,9 +136,9 @@ class Collection extends PureComponent {
 
     const propsToPass = {
       ...receivedEntities,
-      [this.pluralizedType]: extendedRecords,
-      save: (records) => updateStore(this.buildSaveTransforms(records)),
-      remove: (records) => updateStore(this.buildRemoveTransforms(records)),
+      [this.pluralizedType]: extendedCollection,
+      save: (collection) => updateStore(this.buildSaveTransforms(collection)),
+      remove: (collection) => updateStore(this.buildRemoveTransforms(collection)),
       ...queryStatus
     }
 
@@ -174,7 +183,7 @@ const mapRecordsToProps = ({ type, plural, cache, related, relatedTo, sort, filt
 const mergeProps = (record, ownProps) => {
   const pluralizedType = ownProps.plural || pluralize(ownProps.type)
 
-  if ((ownProps.related && !ownProps.relatedTo) || ownProps.cache === 'skip') {
+  if (ownProps.related && !ownProps.relatedTo) {
     return {
       ...record,
       ...ownProps,

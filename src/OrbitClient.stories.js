@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { storiesOf } from '@storybook/react'
 import { withState } from '../.storybook/stateDecorator'
+import Display from '../.docz/docs/Display'
 
 import Planet from '../orbitStories/Planet'
 import Planets from '../orbitStories/Planets'
@@ -103,9 +104,7 @@ const PlanetForm = ({ planet, state }) => (
 const ActiveRecord = ({ planet }) => (
   <div>
     <h3>Active Record</h3>
-    <pre>
-      {JSON.stringify(planet, jsonReplacer, 2)}
-    </pre>
+    <Display name='planet' object={planet} />
   </div>
 )
 
@@ -114,7 +113,7 @@ class AllPlanets extends PureComponent {
     return (
       <div>
         <h3>All planet id's</h3>
-        <Planets>
+        <Planets cache='only'>
           {({ planets }) => (
             <ul>
               {planets.all().map(planet => <li key={planet.id}>{planet.id}</li>)}
@@ -194,10 +193,11 @@ storiesOf('components|orbit-client', module)
             onRemoveCalled: true
           })
           setTimeout(() => storeState({ planetId: undefined }), 2000)
-        }}>
+        }} cache='only'>
         {({ planet, loading, error }) => {
           if (error) return error.message
           if (loading) return 'Loading'
+          if (!planet) return 'no record found in cache'
           return (
             <Container>
               <PlanetForm planet={planet} state={state} />
@@ -215,13 +215,14 @@ storiesOf('components|orbit-client', module)
       flexDirection: 'column'
     }}>
       <FindPlanet state={state} storeState={storeState} />
-      <Planet id={state.planetId}>
-        <Moons related>
-          <Sun related>
+      <Planet id={state.planetId} cache='only'>
+        <Moons related cache='only'>
+          <Sun related cache='only'>
             {(props) => {
               const { planet, moons, sun, loading, error } = props
               if (error) return error.message
               if (loading) return 'Loading'
+              if (!planet) return 'no record found in cache'
               return (
                 <Container>
                   <PlanetForm planet={planet} state={state} />
@@ -239,7 +240,7 @@ storiesOf('components|orbit-client', module)
   .add('Multiple entities', ({ state, storeState }) => (
     <div>
       <h3>All planet id's</h3>
-      <Planets sort={{ attribute: 'name', order: state.sortOrder }}>
+      <Planets sort={{ attribute: 'name', order: state.sortOrder }} cache='only'>
         {({ planets, save, remove }) => (
           <div>
             <ul>

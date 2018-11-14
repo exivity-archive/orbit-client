@@ -174,7 +174,7 @@ const mapRecordsToProps = ({ type, plural, cache, related, relatedTo, sort, filt
 const mergeProps = (record, ownProps) => {
   const pluralizedType = ownProps.plural || pluralize(ownProps.type)
 
-  if (ownProps.related && !ownProps.relatedTo) {
+  if ((ownProps.related && !ownProps.relatedTo) || ownProps.cache === 'skip') {
     return {
       ...record,
       ...ownProps,

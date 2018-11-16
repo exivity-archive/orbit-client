@@ -5,11 +5,11 @@ const store = new Store({
   schema
 })
 
-const sun = {
+const theSun = {
   type: 'sun',
-  id: 'sun',
+  id: 'theSun',
   attributes: {
-    name: 'Sun',
+    name: 'The Sun',
     classification: 'Fusion giant'
   }
 }
@@ -33,7 +33,7 @@ const earth = {
     atmosphere: true
   },
   relationships: {
-    sun: { data: { type: 'sun', id: 'sun' } }
+    sun: { data: { type: 'sun', id: 'theSun' } }
   }
 }
 
@@ -80,14 +80,80 @@ const theMoon = {
   }
 }
 
+const deepImpact = {
+  type: 'satellite',
+  id: 'deepImpact',
+  attributes: {
+    name: 'Deep Impact',
+    class: 'spacecraft'
+  },
+  relationships: {
+    sun: { data: { type: 'sun', id: 'theSun' } }
+  }
+}
+
+const kepler = {
+  type: 'satellite',
+  id: 'kepler',
+  attributes: {
+    name: 'Kepler',
+    class: 'spacecraft'
+  },
+  relationships: {
+    sun: { data: { type: 'sun', id: 'theSun' } }
+  }
+}
+
+const artemis = {
+  type: 'satellite',
+  id: 'artemis',
+  attributes: {
+    name: 'ARTEMIS',
+    class: 'spacecraft'
+  },
+  relationships: {
+    moon: { data: { type: 'moon', id: 'theMoon' } }
+  }
+}
+
+const juno = {
+  type: 'satellite',
+  id: 'juno',
+  attributes: {
+    name: 'Juno',
+    class: 'spacecraft'
+  },
+  relationships: {
+    planet: { data: { type: 'planet', id: 'jupiter' } }
+  }
+}
+
+const galileo = {
+  type: 'satellite',
+  id: 'galileo',
+  attributes: {
+    name: 'Galileo',
+    class: 'spacecraft'
+  },
+  relationships: {
+    planet: { data: { type: 'planet', id: 'jupiter' } }
+  }
+}
+
+
 store.update(t => [
-  t.addRecord(sun),
+  t.addRecord(theSun),
   t.addRecord(jupiter),
   t.addRecord(earth),
   t.addRecord(venus),
   t.addRecord(io),
   t.addRecord(europa),
-  t.addRecord(theMoon)
+  t.addRecord(theMoon),
+  t.addRecord(deepImpact),
+  t.addRecord(kepler),
+  t.addRecord(artemis),
+  t.addRecord(juno),
+  t.addRecord(galileo)
 ])
 
 export default store

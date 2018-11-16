@@ -1,0 +1,124 @@
+---
+name: Advanced usage
+---
+
+import { Playground, PropsTable } from 'docz'
+import Preview from './Preview'
+import Display from './Display'
+import Planet from '../../orbitStories/Planet'
+import Moons from '../../orbitStories/Moons'
+import Sun from '../../orbitStories/Sun'
+import Satellites from '../../OrbitStories/Satellites'
+import { stack, relationships,composing } from './texts'
+
+# Advanced usage
+
+## Stacking/Compounded
+You can 'stack' components. When you stack, each component's loading and error argument will be 'merged'
+into eachother and act as one.
+
+<Preview>
+  { stack }
+</Preview>
+
+<Playground>
+  <Planet id='earth' cache='only'>
+    <Moons cache='only'>
+      <Sun id='theSun' cache='only'>
+        {(client) => (
+          <div>
+            <Display name='client' object={client} collapsed/>
+            <Display name='allMoons' object={client.moons.all()} collapsed/>
+          </div>
+        )}
+      </Sun>
+    </Moons>
+  </Planet>
+</Playground>
+
+## Relationships
+
+### Related
+With the related prop you can get the related records of a Record. If a related Record is
+required for render, you can add the required prop. Collections cannot be required and will either
+return a Collection or an empty array.
+
+The root Record will always be the relatedTo source. In the following example all components
+relate to Planet.
+
+<Preview>
+  { relationships }
+</Preview>
+
+<Playground>
+  <Planet id='earth' cache='only'>
+    <Moons cache='only' related>
+      <Sun cache='only' related>
+        {(client) => (
+          <div>
+            <Display name='client' object={client} collapsed/>
+            <Display name='allRelatedMoons' object={client.moons.all()} collapsed/>
+            <Display name='relatedSun' object={client.sun} collapsed/>
+          </div>
+        )}
+      </Sun>
+    </Moons>
+  </Planet>
+</Playground>
+
+### RelatedTo
+By composition and use of the relatedTo prop you can create usefull combinations yourself.
+
+<Preview>
+  { composing }
+</Preview>
+
+<Playground>
+  <Planet id='earth' cache='only'>
+    <Satellites cache='only'>
+      <Sun related cache='only'>
+        {({ planet, satellites, sun, loading, error }) => (
+          <Satellites related relatedTo={sun} cache='only'>
+            {({ satellites: relatedSatellites, loading, error }) => (
+              <div>
+                <Display name='planet' object={planet} collapsed/>
+                <Display name='allSatellites' object={satellites.all()} collapsed/>
+                <Display name='relatedSun' object={sun} collapsed/>
+                <Display name='satellitesRelatedToSun' object={relatedSatellites.all()} collapsed/>
+              </div>
+            )}
+          </Satellites>
+        )}
+      </Sun>
+    </Satellites>
+  </Planet>
+</Playground>
+
+Note: The relatedTo prop is passed on implicitly when 'stacking' components and as such should not be updateStateRelated
+when using stacks that contain related components relying on the implicit relatedTo prop.
+
+## Cache modes
+Cache modes can be set through the cache prop.
+
+### Record
+For the Record components we have the following modes.
+
+#### only
+Component will only use the store's cache for queries.
+
+#### skip
+Component will skip the cache and query directly on the store, enabling all sources to participate.
+
+#### auto
+This is the default setting for Record components.
+Component will first query the store's cache for a result, if it doesnt find
+anything will query directly on the store.
+
+### Collection
+
+#### only
+Component will only use the store's cache for queries.
+
+#### skip
+This is the default setting for Collection components.
+Component will skip the cache and query directly on the store, enabling all sources to participate.

@@ -1,4 +1,6 @@
 export const imports = {
+  'advancedUsage.mdx': () =>
+    import(/* webpackPrefetch: true, webpackChunkName: "advanced-usage" */ 'advancedUsage.mdx'),
   'collection.mdx': () =>
     import(/* webpackPrefetch: true, webpackChunkName: "collection" */ 'collection.mdx'),
   'gettingStarted.mdx': () =>

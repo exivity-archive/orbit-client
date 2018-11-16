@@ -9,14 +9,33 @@ import { Playground, PropsTable } from 'docz'
 import Planet from '../../orbitStories/Planet'
 import { Record } from '../../src/Record'
 import Display from './Display'
+import Preview from './Preview'
+import { record, recordFuncs } from './texts'
 
+## Record args
+<Preview>
+  { record }
+</Preview>
 
-## Basic usage
+### planet
+Record itself extended with functions to transform and save record.
+
+<Preview>
+  { recordFuncs }
+</Preview>
+
+### loading
+Loading Boolean - Will be set to true when fetching from remote sources or when deleting
+a record.
+
+### error
+Error Boolean
+
+## Record props
+<PropsTable of={Record} />
 
 <Playground>
   <Planet id='earth'>
     {({ planet }) => <Display object={planet}/>}
   </Planet>
 </Playground>
-
-<PropsTable of={Record} />

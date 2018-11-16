@@ -13,7 +13,6 @@ const crud = {
   updateRecord,
   removeRecord,
   performTransforms: (transforms) => dataStore.update(transforms),
-  getRelationships: (model) => schema.models[model].relationships
 }
 
 const Wrapper = ({ children }) => (

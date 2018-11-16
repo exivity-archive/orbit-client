@@ -118,43 +118,43 @@ class Collection extends PureComponent {
       }
 
       if (queryStatus.loading || queryStatus.error) {
-  const propsToPass = {
-    [this.pluralizedType]: null,
-    ...queryStatus
+        const propsToPass = {
+          [this.pluralizedType]: null,
+          ...queryStatus
+        }
+
+        if (typeof children !== 'function') {
+          // Child is component
+          return React.cloneElement(
+            children,
+            propsToPass
+          )
+        }
+
+        return children(propsToPass)
+      }
+
+      const propsToPass = {
+        ...receivedEntities,
+        [this.pluralizedType]: extendedCollection,
+        save: (collection) => updateStore(this.buildSaveTransforms(collection)),
+        remove: (collection) => updateStore(this.buildRemoveTransforms(collection)),
+        ...queryStatus
+      }
+
+      if (typeof this.props.children !== 'function') {
+        // Child is component
+        return React.cloneElement(
+          children,
+          {
+            ...propsToPass,
+            relatedTo
+          }
+        )
+      }
+    // Child is a function
+    return children(propsToPass)
   }
-
-  if (typeof children !== 'function') {
-    // Child is component
-    return React.cloneElement(
-      children,
-      propsToPass
-    )
-  }
-
-  return children(propsToPass)
-}
-
-const propsToPass = {
-  ...receivedEntities,
-  [this.pluralizedType]: extendedCollection,
-  save: (collection) => updateStore(this.buildSaveTransforms(collection)),
-  remove: (collection) => updateStore(this.buildRemoveTransforms(collection)),
-  ...queryStatus
-}
-
-if (typeof this.props.children !== 'function') {
-  // Child is component
-  return React.cloneElement(
-    children,
-    {
-      ...propsToPass,
-      relatedTo
-    }
-  )
-}
-// Child is a function
-return children(propsToPass)
-}
 }
 
 const mapRecordsToProps = ({ type, plural, cache, related, relatedTo, sort, filter, page }) => {

@@ -11,8 +11,8 @@ import { Collection } from '../../src/Collection'
 import Display from './Display'
 
 <Playground>
-  <Planets>
-    {({ planets }) => <Display name='planets' object={planets.all()}/>}
+  <Planets cache='only'>
+    {(client) => <Display name='client' object={client}/>}
   </Planets>
 </Playground>
 

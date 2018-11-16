@@ -12,14 +12,14 @@ const text =
 
 class Preview extends Component {
   componentDidMount() {
-    Prism.highlightAllUnder(document.querySelector('#main'))
+    Prism.highlightAllUnder(document.querySelector('.language-javascript'))
   }
 
   render () {
     return (
       <pre className="language-javscript">
         <code id='main' className="language-javascript">
-          {text}
+          {this.props.children}
         </code>
       </pre>
     )

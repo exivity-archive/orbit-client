@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import CrudContext from './CrudProvider'
-import 'babel-polyfill'
+// import 'babel-polyfill'
 
 function getDisplayName(WrappedComponent) {
   return WrappedComponent.displayName || WrappedComponent.name || 'OrbitModel'

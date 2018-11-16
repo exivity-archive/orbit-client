@@ -1,18 +1,67 @@
 ---
 name: Getting started
-order: 2
 ---
 
-import { Playground, PropsTable } from 'docz'
+import { Playground, PropsTable, Link } from 'docz'
 import Planet from '../../orbitStories/Planet'
+import Planets from '../../orbitStories/Planets'
 import Display from './Display'
-import { Link } from 'docz'
+import Preview from './Preview'
+import { crudProvider, schema, record, collection } from './texts.js'
 
-## Getting Started
+# Getting Started
 
-Orbit-client is a declarative React client for Orbitjs.
+## Installation
+1. Install the package:
+<Preview>
+  yarn add orbit-client
+</Preview>
 
-Orbit is a framework for orchestrating access, transformation, and synchronization between data sources.
-Visit https://orbitjs.com/ for more information.
+## Configuration
+1. Create occonfig.json in the root of your project:
+<Preview>
+  { schema }
+</Preview>
 
-Orbit-client enables you to request, transform and render your data effortlessly.
+2. Run orbit-client command to create components:
+<Preview>
+  yarn orbit-client
+</Preview>
+<br/>
+Note: We use pluralize package to pluralize schema models to Collection component names. If this happens
+incorrectly you can use the plural prop to correct this.
+
+3. Set up a provider to provide orbit-client with your own crud functions:
+<Preview>
+ { crudProvider }
+</Preview>
+<br/>
+Note: Orbit-client uses these functions to query sources other than the cache/memory. We use
+react-orbitjs for querying the cache. You can configure components to only make use of cache or to skip the cache. Learn more about
+this at the <Link to='advanced-usage#cache-modes'>advanced usage</Link> section.
+
+## Basic usage
+Thats it, you are set to go! Now you can use the components from your previously specified
+target directory.
+
+### Record
+<Preview>
+ { record }
+</Preview>
+
+<Playground>
+  <Planet id='earth' cache='only'>
+    {(client) => <Display name='client' object={client}/> }
+  </Planet>
+</Playground>
+
+### Collection
+<Preview>
+ { collection }
+</Preview>
+
+<Playground>
+  <Planets cache='only'>
+    {(client) => <Display name='client' object={client}/> }
+  </Planets>
+</Playground>

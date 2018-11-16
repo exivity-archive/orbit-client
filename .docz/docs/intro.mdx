@@ -1,6 +1,5 @@
 ---
 name: Introduction
-order: 1
 route: /
 ---
 
@@ -9,6 +8,7 @@ import Planet from '../../orbitStories/Planet'
 import Display from './Display'
 import Preview from './Preview'
 import Prism from 'prismjs'
+import { record } from './texts'
 
 # Introduction
 
@@ -19,9 +19,11 @@ Visit https://orbitjs.com/ for more information.
 
 Orbit-client enables you to request, transform and render your data effortlessly.
 
-<Preview/>
+<Preview>
+  { record }
+</Preview>
 
-<Playground>
+<Playground __codesandbox='http:/michiel.com' __position='open'>
   <Planet id='earth'>
     {({ planet, loading, error }) => <Display name='client' object={{ planet, loading, error }} />}
   </Planet>

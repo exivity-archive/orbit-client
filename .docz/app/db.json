@@ -3,9 +3,14 @@
     "title": "orbit-client",
     "description": "An expressive Reactjs client for the Orbitjs framework",
     "themeConfig": {},
-    "menu": [],
+    "menu": [
+      "Introduction",
+      "Getting started",
+      "Advanced usage",
+      "Components"
+    ],
     "ordering": "descending",
-    "version": "0.0.31",
+    "version": "0.0.42",
     "repository": "https://github.com/exivity/orbit-client",
     "native": false,
     "codeSandbox": true,
@@ -16,6 +21,83 @@
     ]
   },
   "entries": {
+    "advancedUsage.mdx": {
+      "name": "Advanced usage",
+      "id": "2c584a9e129a1136e8947c8dede4a604",
+      "filepath": "advancedUsage.mdx",
+      "link": "https://github.com/exivity/orbit-client\\edit\\master\\.docz\\docs\\advancedUsage.mdx",
+      "slug": "advanced-usage",
+      "route": "/advanced-usage",
+      "order": 0,
+      "menu": null,
+      "headings": [
+        {
+          "depth": 1,
+          "slug": "advanced-usage",
+          "value": "Advanced usage"
+        },
+        {
+          "depth": 2,
+          "slug": "stackingcompounded",
+          "value": "Stacking/Compounded"
+        },
+        {
+          "depth": 2,
+          "slug": "relationships",
+          "value": "Relationships"
+        },
+        {
+          "depth": 3,
+          "slug": "related",
+          "value": "Related"
+        },
+        {
+          "depth": 3,
+          "slug": "composing-and-relatedto",
+          "value": "Composing and relatedTo"
+        },
+        {
+          "depth": 2,
+          "slug": "cache-modes",
+          "value": "Cache modes"
+        },
+        {
+          "depth": 3,
+          "slug": "record",
+          "value": "Record"
+        },
+        {
+          "depth": 4,
+          "slug": "only",
+          "value": "only"
+        },
+        {
+          "depth": 4,
+          "slug": "skip",
+          "value": "skip"
+        },
+        {
+          "depth": 4,
+          "slug": "auto",
+          "value": "auto"
+        },
+        {
+          "depth": 3,
+          "slug": "collection",
+          "value": "Collection"
+        },
+        {
+          "depth": 4,
+          "slug": "only-1",
+          "value": "only"
+        },
+        {
+          "depth": 4,
+          "slug": "skip-1",
+          "value": "skip"
+        }
+      ]
+    },
     "collection.mdx": {
       "name": "Collection",
       "menu": "Components",
@@ -35,29 +117,54 @@
     },
     "gettingStarted.mdx": {
       "name": "Getting started",
-      "order": 2,
       "id": "e8eb7452b9e9207c9d4a874aa1bdeb66",
       "filepath": "gettingStarted.mdx",
       "link": "https://github.com/exivity/orbit-client\\edit\\master\\.docz\\docs\\gettingStarted.mdx",
       "slug": "getting-started",
       "route": "/getting-started",
+      "order": 0,
       "menu": null,
       "headings": [
         {
-          "depth": 2,
+          "depth": 1,
           "slug": "getting-started",
           "value": "Getting Started"
+        },
+        {
+          "depth": 2,
+          "slug": "installation",
+          "value": "Installation"
+        },
+        {
+          "depth": 2,
+          "slug": "configuration",
+          "value": "Configuration"
+        },
+        {
+          "depth": 2,
+          "slug": "basic-usage",
+          "value": "Basic usage"
+        },
+        {
+          "depth": 3,
+          "slug": "record",
+          "value": "Record"
+        },
+        {
+          "depth": 3,
+          "slug": "collection",
+          "value": "Collection"
         }
       ]
     },
     "intro.mdx": {
       "name": "Introduction",
-      "order": 1,
       "route": "/",
       "id": "7678080822bd6e1e7ca6819bb8804e46",
       "filepath": "intro.mdx",
       "link": "https://github.com/exivity/orbit-client\\edit\\master\\.docz\\docs\\intro.mdx",
       "slug": "intro",
+      "order": 0,
       "menu": null,
       "headings": [
         {
@@ -84,8 +191,28 @@
         },
         {
           "depth": 2,
-          "slug": "basic-usage",
-          "value": "Basic usage"
+          "slug": "record-args",
+          "value": "Record args"
+        },
+        {
+          "depth": 3,
+          "slug": "planet",
+          "value": "planet"
+        },
+        {
+          "depth": 3,
+          "slug": "loading",
+          "value": "loading"
+        },
+        {
+          "depth": 3,
+          "slug": "error",
+          "value": "error"
+        },
+        {
+          "depth": 2,
+          "slug": "record-props",
+          "value": "Record props"
         }
       ]
     }

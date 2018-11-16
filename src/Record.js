@@ -186,11 +186,20 @@ class Record extends PureComponent {
     }
   }
 
-  setPropertyByPath = (path, value) => {
+  setPropertyByPath = (path, ...args) => {
     const newRecord = { ...this.state[this.props.type] }
 
-    this.findAndSetProperty(path, newRecord, value)
-    this.setState({ [this.props.type]: newRecord })
+    if (args.length === 2) {
+      return () => {
+        this.findAndSetProperty(path, newRecord, value)
+        this.setState({ [this.props.type]: newRecord })
+      }
+    }
+
+    return (value) => {
+      this.findAndSetProperty(path, newRecord, value)
+      this.setState({ [this.props.type]: newRecord })  
+    }
   }
 
   setProperty = (property, ...args) => {
@@ -198,12 +207,12 @@ class Record extends PureComponent {
       const [nextProperty, value] = args
       const val = property === 'relationships' ? { data: value } : value
 
-      return () => this.setPropertyByPath([property, nextProperty], val)
+      return () => this.setPropertyByPath([property, nextProperty], val)()
     }
 
     return (value) => {
       const val = property === 'relationships' ? { data: value } : value
-      this.setPropertyByPath([property, ...args], val)
+      this.setPropertyByPath([property, ...args], val)()
     }
   }
 
@@ -212,7 +221,7 @@ class Record extends PureComponent {
   setRelationship = (...args) => this.setProperty('relationships', ...args)
 
   resetAttributes = (attributes, value = undefined) => {
-    attributes.map(attribute => this.setPropertyByPath(['attributes', attribute], value))
+    attributes.map(attribute => this.setPropertyByPath(['attributes', attribute], value))()
   }
 
   beforeRemove = (...args) => {
@@ -263,7 +272,7 @@ class Record extends PureComponent {
     const relatedToRecord = !relatedTo && (record && record.id) ? record : relatedTo
 
     const queryStatus = {
-      loading: !!this.props.loading || this.state.loading || this.state.loadingTransform,
+      loading: !!this.props.loading || this.state.loading || !!this.state.loadingTransform,
       error: this.props.error || this.state.error
     }
 

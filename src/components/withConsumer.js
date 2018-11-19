@@ -1,13 +1,13 @@
 import React, { PureComponent } from 'react'
-import CrudContext from './CrudProvider'
-// import 'babel-polyfill'
+import CrudContext from './Provider'
+import 'babel-polyfill'
 
 function getDisplayName(WrappedComponent) {
   return WrappedComponent.displayName || WrappedComponent.name || 'OrbitModel'
 }
 
-const withCrudConsumer = (WrappedComponent) => {
-  class ModelWithCrudConsumer extends PureComponent {
+const withConsumer = (WrappedComponent) => {
+  class ModelWithConsumer extends PureComponent {
     render () {
       return (
         <CrudContext.Consumer>
@@ -19,8 +19,8 @@ const withCrudConsumer = (WrappedComponent) => {
     }
   }
 
-  ModelWithCrudConsumer.displayName = getDisplayName(WrappedComponent)
-  return ModelWithCrudConsumer
+  ModelWithConsumer.displayName = getDisplayName(WrappedComponent)
+  return ModelWithConsumer
 }
 
-export default withCrudConsumer
+export default withConsumer

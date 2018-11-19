@@ -5,7 +5,7 @@ const store = new Store({
   schema
 })
 
-const theSun = {
+export const theSun = {
   type: 'sun',
   id: 'theSun',
   attributes: {
@@ -14,7 +14,7 @@ const theSun = {
   }
 }
 
-const jupiter = {
+export const jupiter = {
   type: 'planet',
   id: 'jupiter',
   attributes: {
@@ -24,7 +24,7 @@ const jupiter = {
   }
 }
 
-const earth = {
+export const earth = {
   type: 'planet',
   id: 'earth',
   attributes: {
@@ -37,7 +37,7 @@ const earth = {
   }
 }
 
-const venus = {
+export const venus = {
   type: 'planet',
   id: 'venus',
   attributes: {
@@ -47,7 +47,7 @@ const venus = {
   }
 }
 
-const io = {
+export const io = {
   type: 'moon',
   id: 'io',
   attributes: {
@@ -58,7 +58,7 @@ const io = {
   }
 }
 
-const europa = {
+export const europa = {
   type: 'moon',
   id: 'europa',
   attributes: {
@@ -69,7 +69,15 @@ const europa = {
   }
 }
 
-const theMoon = {
+export const undiscoveredMoon = {
+  type: 'moon',
+  id: 'undiscoveredMoon',
+  attributes: {
+    name: 'Undiscovered Moon'
+  }
+}
+
+export const theMoon = {
   type: 'moon',
   id: 'theMoon',
   attributes: {
@@ -80,7 +88,7 @@ const theMoon = {
   }
 }
 
-const deepImpact = {
+export const deepImpact = {
   type: 'satellite',
   id: 'deepImpact',
   attributes: {
@@ -92,7 +100,7 @@ const deepImpact = {
   }
 }
 
-const kepler = {
+export const kepler = {
   type: 'satellite',
   id: 'kepler',
   attributes: {
@@ -104,7 +112,7 @@ const kepler = {
   }
 }
 
-const artemis = {
+export const artemis = {
   type: 'satellite',
   id: 'artemis',
   attributes: {
@@ -116,7 +124,7 @@ const artemis = {
   }
 }
 
-const juno = {
+export const juno = {
   type: 'satellite',
   id: 'juno',
   attributes: {
@@ -128,7 +136,7 @@ const juno = {
   }
 }
 
-const galileo = {
+export const galileo = {
   type: 'satellite',
   id: 'galileo',
   attributes: {
@@ -140,8 +148,8 @@ const galileo = {
   }
 }
 
-
 store.update(t => [
+  t.addRecord(undiscoveredMoon),
   t.addRecord(theSun),
   t.addRecord(jupiter),
   t.addRecord(earth),

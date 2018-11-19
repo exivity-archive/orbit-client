@@ -1,7 +1,7 @@
 import React from 'react'
 import { DataProvider } from 'react-orbitjs'
 import dataStore from '../../orbitStories/store'
-import CrudContext from '../../src/CrudProvider'
+import CrudContext from '../../src/components/Provider'
 
 const addRecord = (record) => dataStore.update(t => t.addRecord(record))
 const updateRecord = (record) => dataStore.update(t => t.replaceRecord(record))

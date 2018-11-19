@@ -48,13 +48,18 @@
         },
         {
           "depth": 3,
-          "slug": "related",
-          "value": "Related"
+          "slug": "related---hasone-or-hasmany",
+          "value": "Related - hasOne or hasMany"
         },
         {
           "depth": 3,
-          "slug": "composing-and-relatedto",
-          "value": "Composing and relatedTo"
+          "slug": "related---manytomany",
+          "value": "Related - manyToMany"
+        },
+        {
+          "depth": 3,
+          "slug": "relatedto",
+          "value": "RelatedTo"
         },
         {
           "depth": 2,

@@ -6,6 +6,7 @@ import { Playground, PropsTable } from 'docz'
 import Preview from './Preview'
 import Display from './Display'
 import Planet from '../../orbitStories/Planet'
+import Planets from '../../orbitStories/Planets'
 import Moons from '../../orbitStories/Moons'
 import Sun from '../../orbitStories/Sun'
 import Satellites from '../../OrbitStories/Satellites'
@@ -38,7 +39,7 @@ into eachother and act as one.
 
 ## Relationships
 
-### Related
+### Related - hasOne or hasMany
 With the related prop you can get the related records of a Record. If a related Record is
 required for render, you can add the required prop. Collections cannot be required and will either
 return a Collection or an empty array.
@@ -57,13 +58,27 @@ relate to Planet.
         {(client) => (
           <div>
             <Display name='client' object={client} collapsed/>
-            <Display name='allRelatedMoons' object={client.moons.all()} collapsed/>
+            <Display name='relatedMoons' object={client.moons.all()} collapsed/>
             <Display name='relatedSun' object={client.sun} collapsed/>
           </div>
         )}
       </Sun>
     </Moons>
   </Planet>
+</Playground>
+
+### Related - manyToMany
+<Playground>
+  <Planets cache='only'>
+    <Moons cache='only' related>
+      {(client) => (
+        <div>
+          <Display name='planets' object={client.planets.all()} collapsed/>
+          <Display name='moons' object={client.moons.all()} collapsed/>
+        </div>
+      )}
+    </Moons>
+  </Planets>
 </Playground>
 
 ### RelatedTo

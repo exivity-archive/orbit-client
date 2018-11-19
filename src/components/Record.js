@@ -4,7 +4,7 @@ import { withData } from 'react-orbitjs'
 import omit from 'lodash/omit'
 
 import Crud from './Crud'
-import withCrudConsumer from './crudConsumer'
+import withConsumer from './withConsumer'
 
 const notAllowedProps = ['id', 'type', 'related', 'relatedTo', 'children', 'queryStore', 'updateStore',
 'buildRecord', 'addRecord', 'updateRecord', 'removeRecord', 'cache']
@@ -37,7 +37,9 @@ const updateState = (props, state) => {
         recordReference: null,
         [props.type]: null,
         loading: !scenarios.cacheOnly,
-        error: false
+        error: scenarios.cacheOnly
+          ? { message: 'No record found in cache' }
+          : false
       }
     }
 
@@ -66,9 +68,9 @@ const updateState = (props, state) => {
 const updateStateRelated = (props, state) => {
   const scenarios = {
     noRecordToRelateTo: !props.relatedTo,
-    relatedRecordNotFoundInCache: !!props.relatedTo && !props[props.type] && !state.searchedAllSources,
+    relatedRecordNotFoundInCache: !!props.relatedTo && !props[props.type],
     receivedNewRelatedRecord: !!props[props.type] && (props[props.type] !== state.recordReference),
-    noRelatedRecord: !props[props.type] && state.searchedAllSources,
+    noRelatedRecord: !props[props.type],
     cacheOnly: props.cache === 'only'
   }
 
@@ -82,12 +84,41 @@ const updateStateRelated = (props, state) => {
     }
   }
 
-  if (scenarios.relatedRecordNotFoundInCache) {
-    return {
-      recordReference: null,
-      [props.type]: null,
-      loading: !scenarios.cacheOnly,
-      error: false
+  if (scenarios.relatedRecordNotFoundInCache && !props.required) {
+    if (!scenarios.cacheOnly && !state.searchedAllSources) {
+      return {
+        recordReference: null,
+        [props.type]: null,
+        loading: true,
+        error: false
+      }
+    } else {
+      return {
+        recordReference: null,
+        [props.type]: null,
+        loading: false,
+        error: false
+      }
+    }
+  }
+
+  if (scenarios.noRelatedRecord && props.required) {
+    if (!scenarios.cacheOnly && !state.searchedAllSources) {
+      return {
+        recordReference: null,
+        [props.type]: null,
+        loading: true,
+        error: false
+      }
+    } else {
+      return {
+        recordReference: null,
+        [props.type]: null,
+        loading: false,
+        error: {
+          message: `Related ${props.type} has not been found while being required`
+        }
+      }
     }
   }
 
@@ -101,15 +132,6 @@ const updateStateRelated = (props, state) => {
     }
   }
 
-  if (scenarios.noRelatedRecord && props.required) {
-    return {
-      loading: false,
-      error: {
-        message: `Related ${props.type} has not been found while being required`
-      }
-    }
-  }
-
   return null
 }
 
@@ -117,10 +139,14 @@ class Record extends PureComponent {
   constructor (props) {
     super(props)
 
-    this.state = {
-      idReference: null,
-      recordReference: null,
-    }
+    this.state = props.related
+      ? {
+        recordReference: null
+      }
+      : {
+        idReference: null,
+        recordReference: null
+      }
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -264,93 +290,76 @@ class Record extends PureComponent {
     onError && onError(error)
   }
 
+  getQueryStatus = () => ({
+    loading: !!this.props.loading || this.state.loading || !!this.state.loadingTransform,
+    error: this.props.error || this.state.error
+  })
+
+  relatedToRecord = () => {
+    const { relatedTo } = this.props
+    const { record } = this.state
+
+    return !relatedTo && (record && record.id) ? record : relatedTo
+  }
+
+  extendRecord = (record, { add, update, remove }) => ({
+    ...record,
+    setAttribute: this.setAttribute,
+    setRelationship: this.setRelationship,
+    resetAttributes: this.resetAttributes,
+    setProperty: this.setPropertyByPath,
+    save: record && !record.id
+      ? (...args) => add({ ...record }, ...args)
+      : (...args) => update({ ...record }, ...args),
+    remove: (...args) => remove({ ...record }, ...args)
+  })
+
   render () {
-    const { type, children, relatedTo } = this.props
+    const { type, children } = this.props
     const { [type]: record } = this.state
+
+    const relatedTo = this.relatedToRecord()
+    const queryStatus = this.getQueryStatus()
     const receivedEntities = omit(this.props, [...notAllowedProps, type])
-
-    const relatedToRecord = !relatedTo && (record && record.id) ? record : relatedTo
-
-    const queryStatus = {
-      loading: !!this.props.loading || this.state.loading || !!this.state.loadingTransform,
-      error: this.props.error || this.state.error
-    }
 
     return (
       <Crud {...this.props} beforeRemove={this.beforeRemove} onRemove={this.onRemove} onError={this.onError}>
-        {({ add, update, remove }) => {
-          const extendedRecord = record
-            ?  {
-              ...record,
-              setAttribute: this.setAttribute,
-              setRelationship: this.setRelationship,
-              resetAttributes: this.resetAttributes,
-              setProperty: this.setPropertyByPath,
-              save: record && !record.id
-                ? (...args) => add({...record}, ...args)
-                : (...args) => update({...record}, ...args),
-              remove: (...args) => remove({...record}, ...args)
-            }
-            : null
+        {(crud) => {
+          const extendedRecord = record ? this.extendRecord(record, crud) : null
 
           if (queryStatus.loading || queryStatus.error) {
-            const propsToPass = {
+            const propsForChild = {
               [type]: null,
               ...queryStatus
             }
 
-            // Child is component
             if (typeof children !== 'function') {
-              if (children.type.displayName === 'Collection') {
-                return React.cloneElement(
-                  this.props.children,
-                  {
-                    key: `${type}-relatedTo-${relatedTo && relatedTo.id}`,
-                    ...propsToPass,
-                    relatedTo: relatedToRecord
-                  },
-                )
-              } else {
-                return React.cloneElement(
-                  this.props.children,
-                  {
-                    ...propsToPass,
-                    relatedTo: relatedToRecord
-                  },
-                )
-              }
-            }
-
-            return children(propsToPass)
-          }
-
-          // Child is component
-          if (typeof children !== 'function') {
-            if (children.type.displayName === 'Collection') {
               return React.cloneElement(
                 this.props.children,
                 {
                   key: `${type}-relatedTo-${relatedTo && relatedTo.id}`,
-                  [type]: extendedRecord,
-                  ...receivedEntities,
-                  relatedTo: relatedToRecord,
-                  ...queryStatus
-                }
-              )
-            } else {
-              return React.cloneElement(
-                this.props.children,
-                {
-                  [type]: extendedRecord,
-                  ...receivedEntities,
-                  relatedTo: relatedToRecord,
-                  ...queryStatus
-                }
+                  ...propsForChild,
+                  relatedTo
+                },
               )
             }
+
+            return children(propsForChild)
           }
 
-          // Child is a function - Provide record and status in callback
+          if (typeof children !== 'function') {
+            return React.cloneElement(
+              this.props.children,
+              {
+                key: `${type}-relatedTo-${relatedTo && relatedTo.id}`,
+                [type]: extendedRecord,
+                ...receivedEntities,
+                relatedTo,
+                ...queryStatus
+              }
+            )
+          }
+
           return children({
             [type]: extendedRecord,
             ...receivedEntities,
@@ -406,7 +415,7 @@ const mergeProps = (record, ownProps) => {
 
 export { Record }
 
-const WithConsumer = withCrudConsumer(Record)
+const WithConsumer = withConsumer(Record)
 
 export default withData(mapRecordsToProps, mergeProps)(WithConsumer)
 

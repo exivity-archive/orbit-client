@@ -3,10 +3,9 @@ import PropTypes from 'prop-types'
 import { withData } from 'react-orbitjs'
 import omit from 'lodash/omit'
 
-import Crud from './Crud'
-import withConsumer from './withConsumer'
+import withCrud from './withCrud'
 
-const notAllowedProps = ['id', 'type', 'related', 'relatedTo', 'children', 'queryStore', 'updateStore',
+export const notAllowedProps = ['id', 'type', 'related', 'relatedTo', 'children', 'queryStore', 'updateStore',
 'buildRecord', 'addRecord', 'updateRecord', 'removeRecord', 'cache']
 
 const updateState = (props, state) => {
@@ -15,7 +14,18 @@ const updateState = (props, state) => {
     receivedNewId: !!props.id && (props.id !== state.idReference),
     receivedNewRecord: !!props[props.type] && (props[props.type] !== state.recordReference),
     recordNotFoundInCache: !!props.id && !props[props.type],
-    cacheOnly: props.cache === 'only'
+    cacheOnly: props.cache === 'only',
+    loading: props.loading,
+    error: !!props.error
+  }
+
+  if (scenarios.loading || scenarios.error) {
+    return {
+      recordReference: null,
+      [props.type]: null,
+      loading: !!props.loading ,
+      error: props.error || false
+    }
   }
 
   if (scenarios.initializeRecord) {
@@ -38,7 +48,7 @@ const updateState = (props, state) => {
         [props.type]: null,
         loading: !scenarios.cacheOnly,
         error: scenarios.cacheOnly
-          ? { message: 'No record found in cache' }
+          ? { message: `${props.type} not found in cache` }
           : false
       }
     }
@@ -71,21 +81,32 @@ const updateStateRelated = (props, state) => {
     relatedRecordNotFoundInCache: !!props.relatedTo && !props[props.type],
     receivedNewRelatedRecord: !!props[props.type] && (props[props.type] !== state.recordReference),
     noRelatedRecord: !props[props.type],
-    cacheOnly: props.cache === 'only'
+    cacheOnly: props.cache === 'only',
+    loading: props.loading,
+    error: !!props.error
+  }
+
+  if (scenarios.loading || scenarios.error) {
+    return {
+      recordReference: null,
+      [props.type]: null,
+      loading: !!props.loading,
+      error: props.error || false
+    }
   }
 
   if (scenarios.noRecordToRelateTo) {
     return {
       recordReference: null,
       [props.type]: null,
-      searchedAllSources: false,
+      performedQuery: false,
       loading: false,
       error: false
     }
   }
 
   if (scenarios.relatedRecordNotFoundInCache && !props.required) {
-    if (!scenarios.cacheOnly && !state.searchedAllSources) {
+    if (!scenarios.cacheOnly && !state.performedQuery) {
       return {
         recordReference: null,
         [props.type]: null,
@@ -103,7 +124,7 @@ const updateStateRelated = (props, state) => {
   }
 
   if (scenarios.noRelatedRecord && props.required) {
-    if (!scenarios.cacheOnly && !state.searchedAllSources) {
+    if (!scenarios.cacheOnly && !state.performedQuery) {
       return {
         recordReference: null,
         [props.type]: null,
@@ -126,7 +147,7 @@ const updateStateRelated = (props, state) => {
     return {
       recordReference: props[props.type],
       [props.type]: props[props.type],
-      searchedAllSources: false,
+      performedQuery: false,
       loading: false,
       error: false
     }
@@ -134,6 +155,8 @@ const updateStateRelated = (props, state) => {
 
   return null
 }
+
+const proceedIf = (...conditions) => conditions.every(condition => !!condition)
 
 class Record extends PureComponent {
   constructor (props) {
@@ -154,54 +177,43 @@ class Record extends PureComponent {
   }
 
   componentDidMount () {
-    const { id, related, relatedTo } = this.props
-    const { loading } = this.state
-
-    if (loading) {
-      if (related && relatedTo) {
-        this.queryStoreByRelation(relatedTo)
-      } else if (id) {
-        this.queryStoreById(id)
-      }
-    }
+    if (this.shouldQuery()) this.queryStore()
   }
 
   componentDidUpdate () {
-    const { id, related, relatedTo } = this.props
-    const { loading } = this.state
-
-    if (loading) {
-      if (related && relatedTo) {
-        this.queryStoreByRelation(relatedTo)
-      } else if (id) {
-        this.queryStoreById(id)
-      }
-    }
+    if (this.shouldQuery()) this.queryStore()
   }
 
-  queryStoreById = (id) => {
-    this.props.queryStore(q => q.findRecord({ type: this.props.type, id }))
-      .then(() => this.setState({ loading: false }))
-      .catch((error) => {
-        this.setState({
-          loading: false,
-          error
-        })
-      })
+  shouldQuery = () => {
+    const { cache, type } = this.props
+    const { performedQuery, [type]: record, loading, error } = this.state
+
+    return proceedIf(
+      !performedQuery,
+      cache !== 'only',
+      !record,
+      !loading,
+      !error
+    )
   }
 
-  queryStoreByRelation = ({ type, id }) => {
-    this.props.queryStore(q => q.findRelatedRecord({ type, id }, this.props.type))
+  query = (query) => {
+    const { id, related, relatedTo, type } = this.props
+
+    if (related && relatedTo) return query.findRelatedRecord({ type: relatedTo.type, id: relatedTo.id }, type)
+    return query.findRecord({ type, id })
+  }
+
+  queryStore = () => {
+    this.props.queryStore(this.query)
       .then(() => this.setState({
-        searchedAllSources: true,
+        performedQuery: true,
         loading: false,
       }))
-      .catch((error) => {
-        this.setState({
-          loading: false,
-          error
-        })
-      })
+      .catch((error) => this.setState({
+        loading: false,
+        error
+      }))
   }
 
   findAndSetProperty = (path, record, value) => {
@@ -250,124 +262,56 @@ class Record extends PureComponent {
     attributes.map(attribute => this.setPropertyByPath(['attributes', attribute], value))()
   }
 
-  beforeRemove = (...args) => {
-    const { beforeRemove } = this.props
-
-    return new Promise(async (resolve) => {
-      if (beforeRemove) {
-        const proceed = await beforeRemove(...args)
-
-        if (proceed) {
-          this.setState({
-            loadingTransform: true
-          })
-        }
-
-        resolve(proceed)
-      } else {
-        this.setState({
-          loadingTransform: true
-        })
-
-        resolve(true)
-      }
-    })
-  }
-
-  onRemove = (...args) => {
-    const { onRemove } = this.props
-
-    onRemove && onRemove(...args)
-  }
-
-  onError = (error) => {
-    const { onError } = this.props
-
-    this.setState({
-      loadingTransform: false,
-    })
-
-    onError && onError(error)
-  }
-
-  getQueryStatus = () => ({
-    loading: !!this.props.loading || this.state.loading || !!this.state.loadingTransform,
-    error: this.props.error || this.state.error
-  })
-
   relatedToRecord = () => {
-    const { relatedTo } = this.props
-    const { record } = this.state
+    const { relatedTo, type } = this.props
+    const { [type]: record } = this.state
 
-    return !relatedTo && (record && record.id) ? record : relatedTo
+    return !relatedTo && record?.id ? record : relatedTo
   }
 
-  extendRecord = (record, { add, update, remove }) => ({
+  getExtendedRecord = () => {
+    const { [this.props.type]: record } = this.state
+    if (!record) return null
+
+    return {
     ...record,
     setAttribute: this.setAttribute,
     setRelationship: this.setRelationship,
     resetAttributes: this.resetAttributes,
     setProperty: this.setPropertyByPath,
-    save: record && !record.id
-      ? (...args) => add({ ...record }, ...args)
-      : (...args) => update({ ...record }, ...args),
-    remove: (...args) => remove({ ...record }, ...args)
-  })
+    save: !record?.id
+      ? (...args) => this.props.addRecord({ ...record }, ...args)
+      : (...args) => this.props.updateRecord({ ...record }, ...args),
+    remove: (...args) => this.props.removeRecord({ ...record }, ...args)
+  }}
+
+  getStateAndReceivedEntities = () => {
+    const receivedEntities = omit(this.props, [...notAllowedProps, this.props.type])
+
+    return {
+      [this.props.type]: this.getExtendedRecord(),
+      ...receivedEntities,
+      loading: this.state.loading,
+      error: this.state.error
+    }
+  }
 
   render () {
     const { type, children } = this.props
-    const { [type]: record } = this.state
-
     const relatedTo = this.relatedToRecord()
-    const queryStatus = this.getQueryStatus()
-    const receivedEntities = omit(this.props, [...notAllowedProps, type])
 
-    return (
-      <Crud {...this.props} beforeRemove={this.beforeRemove} onRemove={this.onRemove} onError={this.onError}>
-        {(crud) => {
-          const extendedRecord = record ? this.extendRecord(record, crud) : null
+    if (typeof children !== 'function') {
+      return React.cloneElement(
+        this.props.children,
+        {
+          key: `${type}-relatedTo-${relatedTo?.id}`,
+          ...this.getStateAndReceivedEntities(),
+          relatedTo,
+        }
+      )
+    }
 
-          if (queryStatus.loading || queryStatus.error) {
-            const propsForChild = {
-              [type]: null,
-              ...queryStatus
-            }
-
-            if (typeof children !== 'function') {
-              return React.cloneElement(
-                this.props.children,
-                {
-                  key: `${type}-relatedTo-${relatedTo && relatedTo.id}`,
-                  ...propsForChild,
-                  relatedTo
-                },
-              )
-            }
-
-            return children(propsForChild)
-          }
-
-          if (typeof children !== 'function') {
-            return React.cloneElement(
-              this.props.children,
-              {
-                key: `${type}-relatedTo-${relatedTo && relatedTo.id}`,
-                [type]: extendedRecord,
-                ...receivedEntities,
-                relatedTo,
-                ...queryStatus
-              }
-            )
-          }
-
-          return children({
-            [type]: extendedRecord,
-            ...receivedEntities,
-            ...queryStatus
-          })
-        }}
-      </Crud>
-    )
+    return children(this.getStateAndReceivedEntities())
   }
 }
 
@@ -390,7 +334,7 @@ const mapRecordsToProps = ({ id, type, related, relatedTo, cache }) => {
 
 const mergeProps = (record, ownProps) => {
   // Temporary fix for react-orbitjs not clearing last result when nothing is found
-  if (ownProps.related && ownProps.relatedTo && (!ownProps.relatedTo.relationships || !ownProps.relatedTo.relationships[ownProps.type])) {
+  if (ownProps.related && !ownProps.relatedTo?.relationships[ownProps.type]) {
     return {
       ...record,
       ...ownProps,
@@ -415,9 +359,9 @@ const mergeProps = (record, ownProps) => {
 
 export { Record }
 
-const WithConsumer = withConsumer(Record)
+const WithCrud = withCrud(Record)
 
-export default withData(mapRecordsToProps, mergeProps)(WithConsumer)
+export default withData(mapRecordsToProps, mergeProps)(WithCrud)
 
 Record.defaultProps = {
   relatedTo: null,
@@ -436,12 +380,6 @@ Record.propTypes = {
   addRecord: PropTypes.func.isRequired,
   updateRecord: PropTypes.func.isRequired,
   removeRecord: PropTypes.func.isRequired,
-  beforeAdd: PropTypes.func,
-  onAdd: PropTypes.func,
-  beforeUpdate: PropTypes.func,
-  onUpdate: PropTypes.func,
-  beforeRemove: PropTypes.func,
-  onRemove: PropTypes.func,
   related: PropTypes.bool,
   relatedTo: PropTypes.object,
   required: PropTypes.bool

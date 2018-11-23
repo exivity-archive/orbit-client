@@ -1,0 +1,38 @@
+import React, { PureComponent } from 'react'
+import CrudContext from './Provider'
+import Crud from './Crud'
+
+function getDisplayName(WrappedComponent) {
+  return WrappedComponent.displayName || WrappedComponent.name || 'OrbitModel'
+}
+
+const withCrud = (WrappedComponent) => {
+  class ModelWithCrud extends PureComponent {
+    render () {
+      const { beforeAdd, onAdd, beforeUpdate, onUpdate, beforeRemove, onRemove, ...rest } = this.props
+
+      return (
+        <CrudContext.Consumer>
+          {(crud) => (
+            <Crud {...crud}
+              beforeAdd={beforeAdd}
+              onAdd={onAdd}
+              beforeUpdate={beforeUpdate}
+              onUpdate={onUpdate}
+              beforeRemove={beforeRemove}
+              onRemove={onRemove}>
+              {(extendedCrud) => (
+                <WrappedComponent {...rest} {...extendedCrud} />
+              )}
+            </Crud>
+          )}
+        </CrudContext.Consumer>
+      )
+    }
+  }
+
+  ModelWithCrud.displayName = getDisplayName(WrappedComponent)
+  return ModelWithCrud
+}
+
+export default withCrud

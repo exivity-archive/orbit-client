@@ -158,6 +158,15 @@ const updateStateRelated = (props, state) => {
 
 export const proceedIf = (...conditions) => conditions.every(condition => !!condition)
 
+export const curried = (fn) => (...args) => {
+  if (args.length === 2) {
+    if (typeof args[1] === 'function') return (value) => fn(args[0], args[1](value))
+    return () => fn(...args)
+  }
+
+  return (value) => fn(args[0], value)
+}
+
 class Record extends PureComponent {
   constructor (props) {
     super(props)
@@ -218,16 +227,16 @@ class Record extends PureComponent {
 
   findAndSetProperty = (path, record, value) => {
     if (path.length === 1) {
-      record[path] = value
+      record[path[0]] = value
     } else {
       this.findAndSetProperty(path.slice(1), record[path[0]], value)
     }
   }
 
-  setPropertyByPath = (path, ...args) => {
+  setPropertyByPath = (path, value) => {
     const newRecord = { ...this.state[this.props.type] }
 
-    if (args.length === 2) {
+    if (value) {
       return () => {
         this.findAndSetProperty(path, newRecord, value)
         this.setState({ [this.props.type]: newRecord })
@@ -240,33 +249,39 @@ class Record extends PureComponent {
     }
   }
 
-  setProperty = (property, ...args) => {
-    if (args.length === 2) {
-      const [nextProperty, value] = args
-      const val = property === 'relationships' ? { data: value } : value
-
-      return () => this.setPropertyByPath([property, nextProperty], val)()
+  setAttribute = (attribute, value) => this.setState(({[this.props.type]: record }) => ({
+    [this.props.type]: {
+      ...record,
+      attributes: {
+        ...record.attributes,
+        [attribute]: value
+      }
     }
+  }))
 
-    return (value) => {
-      const val = property === 'relationships' ? { data: value } : value
-      this.setPropertyByPath([property, ...args], val)()
+  setRelationship = (relationship, value) => this.setState(({[this.props.type]: record }) => ({
+    [this.props.type]: {
+      ...record,
+      relationships: {
+        ...record.attributes,
+        [relationship]: {
+          data: value
+        }
+      }
     }
-  }
-
-  setAttribute = (...args) => this.setProperty('attributes', ...args)
-
-  setRelationship = (...args) => this.setProperty('relationships', ...args)
+  }))
 
   resetAttributes = (attributes, value = undefined) => {
-    attributes.map(attribute => this.setPropertyByPath(['attributes', attribute], value))()
+    attributes.map(attribute => this.setAttribute(attribute, value))
   }
 
   relatedToRecord = () => {
     const { relatedTo, type } = this.props
     const { [type]: record } = this.state
 
-    return !relatedTo && record?.id ? record : relatedTo
+    return !relatedTo && record?.id
+      ? record
+      : relatedTo
   }
 
   getExtendedRecord = () => {
@@ -275,8 +290,8 @@ class Record extends PureComponent {
 
     return {
     ...record,
-    setAttribute: this.setAttribute,
-    setRelationship: this.setRelationship,
+    setAttribute: curried(this.setAttribute),
+    setRelationship: curried(this.setRelationship),
     resetAttributes: this.resetAttributes,
     setProperty: this.setPropertyByPath,
     save: !record?.id

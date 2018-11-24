@@ -52,6 +52,10 @@ const FindPlanet = ({ state, storeState }) => (
   </div>
 )
 
+const getValue = (event) => event.target.value
+
+const getChecked = (event) => event.target.checked
+
 const PlanetForm = ({ planet, state }) => (
   <div>
     <h3>Planet</h3>
@@ -63,13 +67,13 @@ const PlanetForm = ({ planet, state }) => (
     }}>
       <label>Name:</label>
       <input value={planet.attributes.name}
-        onChange={(event) => planet.setAttribute('name', event.target.value)()} />
+        onChange={planet.setAttribute('name', getValue)} />
       <label>Classification:</label>
       <input value={planet.attributes.classification}
-        onChange={(event) => planet.setAttribute('classification', event.target.value)()} />
+        onChange={planet.setAttribute('classification', getValue)} />
       <label>Atmosphere:</label>
-      <input type='checkbox' value={planet.attributes.atmosphere}
-        onChange={(event) => planet.setAttribute('atmosphere', event.target.value)()} />
+      <input type='checkbox' checked={planet.attributes.atmosphere}
+        onChange={planet.setAttribute('atmosphere', getChecked)} />
       <button onClick={event => {
         event.preventDefault()
         planet.save()

@@ -1,6 +1,6 @@
 import React from 'react'
 import TestRenderer from 'react-test-renderer'
-import { Record } from '../components/Record'
+import { Record, proceedIf } from '../components/Record'
 import { earth, theMoon } from '../../orbitStories/store'
 
 const contextFn = {
@@ -364,6 +364,13 @@ describe('Record', () => {
       expect(childrenArgs.moon).not.toBe(propsMoon.moon)
       expect(childrenArgs.planet).toEqual(expect.objectContaining(extendedRecord))
       expect(childrenArgs.moon).toEqual(expect.objectContaining(extendedRecord))
+    })
+  })
+
+  describe('methods', () => {
+    test('proceedIf', () => {
+      expect(proceedIf(true, true, true)).toEqual(true)
+      expect(proceedIf(true, false, true)).toEqual(false)
     })
   })
 })

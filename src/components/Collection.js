@@ -53,7 +53,7 @@ class Collection extends PureComponent {
   }
 
   query = () => {
-    const { queryStore, type } = this.props
+    const { queryStore, type, relatedTo } = this.props
     const relatedToCollection = Array.isArray(relatedTo)
     let relatedIds
 

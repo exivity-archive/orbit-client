@@ -156,7 +156,7 @@ const updateStateRelated = (props, state) => {
   return null
 }
 
-const proceedIf = (...conditions) => conditions.every(condition => !!condition)
+export const proceedIf = (...conditions) => conditions.every(condition => !!condition)
 
 class Record extends PureComponent {
   constructor (props) {

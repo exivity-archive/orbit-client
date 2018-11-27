@@ -213,6 +213,7 @@ const mergeProps = (record, ownProps) => {
 
   if (ownProps.cache === 'skip') {
     return {
+      ...record,
       ...ownProps
     }
   }

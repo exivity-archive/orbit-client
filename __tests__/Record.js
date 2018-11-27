@@ -1,7 +1,7 @@
 import React from 'react'
 import TestRenderer from 'react-test-renderer'
-import { Record, proceedIf, curried } from '../components/Record'
-import { earth, theMoon } from '../../orbitStories/store'
+import { Record, proceedIf, curried } from '../src/components/Record'
+import { earth, theMoon } from '../orbitStories/store'
 
 const contextFn = {
   buildRecord: (type) => ({

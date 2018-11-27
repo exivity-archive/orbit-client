@@ -5,9 +5,22 @@ import pluralize from 'pluralize'
 import omit from 'lodash/omit'
 
 import decorateQuery from '../utils/decorateQuery'
+import { proceedIf } from './Record'
 
 const notAllowedProps = ['id', 'type', 'related', 'relatedTo', 'children', 'queryStore', 'updateStore', 'plural',
   'cache']
+
+const findRelatedRecords = (collection, relatedIds) => collection.filter(record => relatedIds.includes(record.id))
+
+const getIdsFromRelatedCollection = (relatedToCollection, ownType) => {
+  return relatedToCollection.reduce((ids, record) => {
+    const idsToAdd = record.relationships && record.relationships[ownType] &&
+      record.relationships[ownType].data.map(item => item.id)
+
+    if (idsToAdd) return ids.concat(idsToAdd)
+    return ids
+  }, [])
+}
 
 class Collection extends PureComponent {
   constructor (props) {
@@ -16,24 +29,10 @@ class Collection extends PureComponent {
     this.pluralizedType = props.plural || pluralize(props.type)
 
     this.state = {
-      fetchedCollection: [],
+      [this.pluralizedType]: [],
       loading: false,
       error: false
     }
-  }
-
-  static findRelatedRecords (collection, relatedIds) {
-    return collection.filter(record => relatedIds.includes(record.id))
-  }
-
-  static getIdsFromRelatedCollection (relatedToCollection, ownType) {
-    return relatedToCollection.reduce((ids, record) => {
-      const idsToAdd = record.relationships && record.relationships[ownType] &&
-        record.relationships[ownType].data.map(item => item.id)
-
-      if (idsToAdd) return ids.concat(idsToAdd)
-      return ids
-    }, [])
   }
 
   componentDidMount () {
@@ -45,6 +44,8 @@ class Collection extends PureComponent {
     if (!related) this.startQuery(this.query)
   }
 
+  isControlled = (prop) => this.props[prop] !== undefined ? this.props[prop] : this.state[prop]
+
   startQuery = (query) => {
     this.setState({
       loading: true,
@@ -53,19 +54,19 @@ class Collection extends PureComponent {
   }
 
   query = () => {
-    const { queryStore, type, relatedTo } = this.props
+    const { queryStore, type } = this.props
     const relatedToCollection = Array.isArray(relatedTo)
     let relatedIds
 
     if (relatedToCollection) {
       if (!relatedToCollection.length) return null
-      relatedIds = this.getIdsFromRelatedCollection(relatedTo, type)
+      relatedIds = getIdsFromRelatedCollection(relatedTo, type)
     }
 
     queryStore(q => q.findRecords(type))
       .then((fetchedCollection) => this.setState({
-        fetchedCollection: relatedToCollection
-          ? this.findRelatedRecords(fetchedCollection, relatedIds)
+        [this.pluralizedType]: relatedToCollection
+          ? findRelatedRecords(fetchedCollection, relatedIds)
           : fetchedCollection,
         loading: false
       }))
@@ -83,7 +84,7 @@ class Collection extends PureComponent {
     queryStore(q => q.findRelatedRecords({ type: relatedTo.type, id: relatedTo.id }, this.pluralizedType))
       .then((fetchedCollection) => {
         this.setState({
-          fetchedCollection,
+          [this.pluralizedType]: fetchedCollection,
           loading: false
         })
       })
@@ -125,64 +126,53 @@ class Collection extends PureComponent {
     return t.removeRecord(record)
   })
 
-  render () {
-    const { [this.pluralizedType]: collection, type, relatedTo, updateStore, cache, children } = this.props
-    const receivedEntities = omit(this.props, [...notAllowedProps, type])
+  getRelatedTo = () => {
+    const { [this.pluralizedType]: collection, related, relatedTo } = this.props
 
-    const relatedToRecordOrCollection = !relatedTo ? collection : relatedTo
+    if (proceedIf(relatedTo)) return relatedTo
+    if (proceedIf(related, !relatedTo)) return null
+    if (proceedIf(!related, !relatedTo)) return collection.length ? collection : null
+  }
 
-    const queryStatus = {
-      loading: !!this.props.loading || this.state.loading,
-      error: this.props.error || this.state.error
-    }
+  getCollectionAndHelpers = () => ({
+    findOne: this.findOne,
+    find: this.find,
+    findByAttribute: this.findByAttribute,
+    all: () => this.isControlled(this.pluralizedType)
+  })
 
-    const extendedCollection = {
-      findOne: this.findOne,
-      find: this.find,
-      findByAttribute: this.findByAttribute,
-      all: () => cache === 'only' ? collection : this.state.fetchedCollection
-    }
+  getExtendedCollectionAndHelpers = () => {
+    const receivedEntities = omit(this.props, [...notAllowedProps, this.props.type])
+    const loading = !!this.props.loading || this.state.loading
+    const error = this.props.error || this.state.error
 
-    if (queryStatus.loading || queryStatus.error) {
-      const propsToPass = {
-        [this.pluralizedType]: null,
-        ...queryStatus
-      }
-
-      if (typeof children !== 'function') {
-        // Child is component
-        return React.cloneElement(
-          children,
-          {
-            ...propsToPass,
-            relatedTo: relatedToRecordOrCollection
-          }
-        )
-      }
-
-      return children(propsToPass)
-    }
-
-    const propsToPass = {
+    return {
       ...receivedEntities,
-      [this.pluralizedType]: extendedCollection,
-      save: (collection) => updateStore(this.buildSaveTransforms(collection)),
-      remove: (collection) => updateStore(this.buildRemoveTransforms(collection)),
-      ...queryStatus
+      [this.pluralizedType]: loading || error ? null : this.getCollectionAndHelpers(),
+      save: (collection) => this.props.updateStore(this.buildSaveTransforms(collection)),
+      remove: (collection) => this.props.updateStore(this.buildRemoveTransforms(collection)),
+      loading,
+      error,
     }
+  }
+
+  render () {
+    const relatedToRecordOrCollection = this.getRelatedTo()
+    const extendedCollection = this.getExtendedCollectionAndHelpers()
 
     if (typeof this.props.children !== 'function') {
       // Child is component
       return React.cloneElement(
-        children,
+        this.props.children,
         {
-          ...propsToPass,
+          ...extendedCollection,
           relatedTo: relatedToRecordOrCollection
         }
       )
     }
+
     // Child is a function
-    return children(propsToPass)
+    return this.props.children(extendedCollection)
   }
 }
 
@@ -225,13 +215,13 @@ const mergeProps = (record, ownProps) => {
   }
 
   if (ownProps.related && Array.isArray(ownProps.relatedTo)) {
-    const relatedIds = Collection.getIdsFromRelatedCollection(ownProps.relatedTo, pluralizedType)
+    const relatedIds = getIdsFromRelatedCollection(ownProps.relatedTo, pluralizedType)
 
     // memoization to be used/applied
     return {
       ...record,
       ...ownProps,
-      [pluralizedType]: Collection.findRelatedRecords(record[pluralizedType], relatedIds)
+      [pluralizedType]: findRelatedRecords(record[pluralizedType], relatedIds)
     }
   }
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import TestRenderer from 'react-test-renderer'
-import { Record, proceedIf } from '../components/Record'
+import { Record, proceedIf, curried } from '../components/Record'
 import { earth, theMoon } from '../../orbitStories/store'
 
 const contextFn = {
@@ -371,6 +371,29 @@ describe('Record', () => {
     test('proceedIf', () => {
       expect(proceedIf(true, true, true)).toEqual(true)
       expect(proceedIf(true, false, true)).toEqual(false)
+    })
+
+    test('curried', () => {
+      const testFn = () => 'test'
+      const curriedFn = curried(testFn)
+
+      expect(typeof curriedFn()).toEqual('function')
+      expect(typeof curriedFn()()).toEqual('string')
+    })
+
+    test('curried with args and callback', () => {
+      const testFn = (property, value) => value
+      const curriedFn = curried(testFn)
+
+      const test = {
+        name: 'Test',
+        doubleCheck: 'Check'
+      }
+
+      expect(curriedFn()('Test')).toEqual('Test')
+      expect(curriedFn('attribute', (test) => test.name)(test)).toEqual('Test')
+      expect(curriedFn('attribute', (test) => test.doubleCheck)(test)).toEqual('Check')
+      expect(curriedFn('attribute', (test) => test.doesNotExist)(test)).toEqual(undefined)
     })
   })
 })

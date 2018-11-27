@@ -9,8 +9,6 @@ import { DataProvider } from 'react-orbitjs'
 import dataStore from '../orbitStories/store'
 import CrudContext from '../src/components/Provider'
 
-import schema from '../orbitStories/schema'
-
 const options = {
   name: '@exivity/orbit-client',
   url: 'https://github.com/exivity/orbit-client',
@@ -29,7 +27,7 @@ const withStyle = story => <div style={{
   </WithStyle>
 </div>
 
-const PLANET = (type) => ({
+const BUILD = (type) => ({
   type,
   id: undefined,
   attributes: {
@@ -44,11 +42,10 @@ const updateRecord = (record) => dataStore.update(t => t.replaceRecord(record))
 const removeRecord = (record) => dataStore.update(t => t.removeRecord(record))
 
 const crud = {
-  buildRecord: (type) => PLANET(type),
+  buildRecord: (type) => BUILD(type),
   addRecord,
   updateRecord,
   removeRecord
-  // performTransforms: (transforms) => dataStore.update(transforms)
 }
 
 class Provider extends Component {
@@ -88,7 +85,7 @@ addDecorator(withStyle)
 addDecorator((story) => <Provider story={story} />)
 
 // automatically import all files ending in *.stories.js
-const req = require.context('../src', true, /.stories.js$/)
+const req = require.context('../orbitStories', true, /.stories.js$/)
 
 function loadStories () {
   req.keys().forEach(filename => req(filename))

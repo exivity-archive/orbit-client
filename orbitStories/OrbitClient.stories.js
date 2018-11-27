@@ -1,20 +1,12 @@
 import React, { PureComponent } from 'react'
 import { storiesOf } from '@storybook/react'
-import { withState } from '../../.storybook/stateDecorator'
-import Display from '../../.docz/docs/Display'
+import { withState } from '../.storybook/stateDecorator'
+import Display from '../.docz/docs/Display'
 
-import Planet from '../../orbitStories/Planet'
-import Planets from '../../orbitStories/Planets'
-import Moons from '../../orbitStories/Moons'
-import Sun from '../../orbitStories/Sun'
-
-const jsonReplacer = function (key, val) {
-  if (typeof val === 'function') {
-    return 'function'
-  }
-
-  return val
-};
+import Planet from './Planet'
+import Planets from './Planets'
+import Moons from './Moons'
+import Sun from './Sun'
 
 const CenterField = (story) => (
   <div style={{

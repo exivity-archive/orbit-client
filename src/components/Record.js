@@ -346,10 +346,11 @@ const mapRecordsToProps = ({ id, type, related, relatedTo, cache }) => {
   return {}
 }
 
+const noRelation = (ownProps) => ownProps.related && !ownProps.relatedTo?.relationships[ownProps.type]
 
 const mergeProps = (record, ownProps) => {
   // Temporary fix for react-orbitjs not clearing last result when nothing is found
-  if (ownProps.related && !ownProps.relatedTo?.relationships[ownProps.type]) {
+  if (noRelation(ownProps)) {
     return {
       ...record,
       ...ownProps,

@@ -54,7 +54,7 @@ class Collection extends PureComponent {
   }
 
   query = () => {
-    const { queryStore, type } = this.props
+    const { queryStore, type, relatedTo } = this.props
     const relatedToCollection = Array.isArray(relatedTo)
     let relatedIds
 
@@ -97,19 +97,19 @@ class Collection extends PureComponent {
   }
 
   findOne = (id) => {
-    const { [this.props.type]: collection } = this.props
+    const collection = this.isControlled(this.pluralizedType)
 
     return collection.find(item => item.id === id)
   }
 
   find = (ids) => {
-    const { [this.props.type]: collection } = this.props
+    const collection = this.isControlled(this.pluralizedType)
 
     return ids.map(id => collection.find(item => item.id === id))
   }
 
   findByAttribute = ({ attribute, value }) => {
-    const { [this.props.type]: collection } = this.props
+    const collection = this.isControlled(this.pluralizedType)   
 
     return collection.filter(item => item.attributes[attribute] === value)
   }

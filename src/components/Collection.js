@@ -127,11 +127,13 @@ class Collection extends PureComponent {
   })
 
   getRelatedTo = () => {
-    const { [this.pluralizedType]: collection, related, relatedTo } = this.props
+    const { related, relatedTo } = this.props
 
     if (proceedIf(relatedTo)) return relatedTo
     if (proceedIf(related, !relatedTo)) return null
-    if (proceedIf(!related, !relatedTo)) return collection.length ? collection : null
+    if (proceedIf(!related, !relatedTo)) {
+      return this.isControlled(this.pluralizedType).length ? collection : null
+    }
   }
 
   getCollectionAndHelpers = () => ({

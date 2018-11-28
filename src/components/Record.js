@@ -1,11 +1,15 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { withData } from 'react-orbitjs'
-import omit from 'lodash/omit'
 
 import withCrud from './withCrud'
 
-export const notAllowedProps = ['id', 'type', 'related', 'relatedTo', 'children', 'queryStore', 'updateStore',
+import {
+  memoizedGetExtendedRecord,
+  memoizedGetRecordAndHelpers
+} from '../utils/selectors'
+
+export const notAllowedPropsRecord = ['id', 'type', 'related', 'relatedTo', 'children', 'queryStore', 'updateStore',
 'buildRecord', 'addRecord', 'updateRecord', 'removeRecord', 'cache']
 
 const updateState = (props, state) => {
@@ -194,10 +198,12 @@ class Record extends PureComponent {
   }
 
   shouldQuery = () => {
-    const { cache, type } = this.props
+    const { cache, type, related, relatedTo } = this.props
     const { performedQuery, [type]: record, loading, error } = this.state
 
     return proceedIf(
+      related && relatedTo,
+      !related,
       !performedQuery,
       cache !== 'only',
       !record,
@@ -285,30 +291,22 @@ class Record extends PureComponent {
   }
 
   getExtendedRecord = () => {
-    const { [this.props.type]: record } = this.state
-    if (!record) return null
+    return memoizedGetExtendedRecord({
+      props: this.props,
+      state: this.state,
+      setAttribute: this.setAttribute,
+      setRelationship: this.setRelationship,
+      resetAttributes: this.resetAttributes,
+      setProperty: this.setPropertyByPath,
+    })
+  }
 
-    return {
-    ...record,
-    setAttribute: curried(this.setAttribute),
-    setRelationship: curried(this.setRelationship),
-    resetAttributes: this.resetAttributes,
-    setProperty: this.setPropertyByPath,
-    save: !record?.id
-      ? (...args) => this.props.addRecord({ ...record }, ...args)
-      : (...args) => this.props.updateRecord({ ...record }, ...args),
-    remove: (...args) => this.props.removeRecord({ ...record }, ...args)
-  }}
-
-  getStateAndReceivedEntities = () => {
-    const receivedEntities = omit(this.props, [...notAllowedProps, this.props.type])
-
-    return {
-      [this.props.type]: this.getExtendedRecord(),
-      ...receivedEntities,
-      loading: this.state.loading,
-      error: this.state.error
-    }
+  getRecordAndHelpers = () => {
+    return memoizedGetRecordAndHelpers({
+      props: this.props,
+      state: this.state,
+      record: this.getExtendedRecord()
+    })
   }
 
   render () {
@@ -320,13 +318,13 @@ class Record extends PureComponent {
         this.props.children,
         {
           key: `${type}-relatedTo-${relatedTo?.id}`,
-          ...this.getStateAndReceivedEntities(),
+          ...this.getRecordAndHelpers(),
           relatedTo,
         }
       )
     }
 
-    return children(this.getStateAndReceivedEntities())
+    return children(this.getRecordAndHelpers())
   }
 }
 

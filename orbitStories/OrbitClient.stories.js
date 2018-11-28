@@ -112,7 +112,7 @@ class AllPlanets extends PureComponent {
         <Planets cache='only'>
           {({ planets }) => (
             <ul>
-              {planets.all().map(planet => <li key={planet.id}>{planet.id}</li>)}
+              {planets.map(planet => <li key={planet.id}>{planet.id}</li>)}
             </ul>
           )}
         </Planets>
@@ -129,7 +129,7 @@ class AllRelated extends PureComponent {
       <div>
         <h3>Related moons</h3>
         <ul>
-          {moons.all().map(moon => <li key={moon.id}>{moon.id}</li>)}
+          {moons.map(moon => <li key={moon.id}>{moon.id}</li>)}
         </ul>
         <h3>Related sun</h3>
         <ul>
@@ -240,14 +240,14 @@ storiesOf('components|orbit-client', module)
         {({ planets, save, remove }) => (
           <div>
             <ul>
-              {planets.all().map(planet => <li key={planet.id}>{planet.id}</li>)}
+              {planets.map(planet => <li key={planet.id}>{planet.id}</li>)}
             </ul>
             <button onClick={() => save([
               { type: 'planet', id: 'mars', attributes: { name: 'Mars'} },
               { type: 'planet', id: 'exivity to the moon', attributes: { name: 'Rocket'}  },
               { type: 'planet', id: 'neptunus', attributes: { name: 'Neptunusr'} }
             ])}>Create records</button>
-            <button onClick={() => remove(planets.all())}>Delete all records</button>
+            <button onClick={() => remove(planets)}>Delete all records</button>
             <button onClick={() => {
               storeState({ sortOrder: state.sortOrder === 'ascending' ? 'descending' : 'ascending' })
             }}>

@@ -46,15 +46,15 @@ class Crud extends PureComponent {
     }
   }
 
-  getHelpers = () => ({
+  state = {
     buildRecord: this.build,
     addRecord: this.add,
     updateRecord: this.update,
     removeRecord: this.remove
-  })
+  }
 
   render () {
-    return this.props.children(this.getHelpers())
+    return this.props.children(this.state)
   }
 }
 

@@ -275,7 +275,7 @@ class Record extends PureComponent {
     [this.props.type]: {
       ...record,
       relationships: {
-        ...record.attributes,
+        ...record.relationships,
         [relationship]: {
           data: value
         }

@@ -8,6 +8,7 @@ import { WithStyle } from '@exivity/ui'
 import { DataProvider } from 'react-orbitjs'
 import dataStore from '../orbitStories/store'
 import CrudContext from '../src/components/Provider'
+import schema from '../orbitStories/schema'
 
 const options = {
   name: '@exivity/orbit-client',
@@ -45,7 +46,8 @@ const crud = {
   buildRecord: (type) => BUILD(type),
   addRecord,
   updateRecord,
-  removeRecord
+  removeRecord,
+  schema,
 }
 
 class Provider extends Component {

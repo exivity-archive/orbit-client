@@ -255,6 +255,12 @@ class Record extends PureComponent {
     }
   }
 
+  hasRelationship = (relationship) => {
+    const {[this.props.type]: record} = this.state
+
+    return record.relationships && !!record.relationships[relationship]
+  }
+
   setAttribute = (attribute, value) => this.setState(({[this.props.type]: record }) => ({
     [this.props.type]: {
       ...record,
@@ -277,6 +283,60 @@ class Record extends PureComponent {
     }
   }))
 
+  addRelationship = (relatedRecord) => {
+    const { schema, type } = this.props
+    const { [type]: record } = this.state
+
+    const model = schema.getModel(type)
+    const relationships = Object.entries(model.relationships)
+    const relationship = relationships.find(([relation, obj]) => obj.model === relatedRecord.type)
+
+    if (relationship) {
+      const [key, obj] = relationship
+
+      if (obj.type === 'hasOne') {
+        this.setRelationship(key, relatedRecord)
+      }
+
+      if (obj.type === 'hasMany') {
+        if (this.hasRelationship(key)) {
+          const relatedCollection = record.relationships[key].data.concat([ relatedRecord ])
+          this.setRelationship(key, relatedCollection)
+        } else {
+          this.setRelationship(key, [ relatedRecord ])
+        }
+      }
+    } else {
+      throw new Error(`${relatedRecord.type} is not defined as a relation`)
+    }
+  }
+
+  removeRelationship = (relatedRecord) => {
+    const { schema, type } = this.props
+    const { [type]: record } = this.state
+
+    const model = schema.getModel(type)
+    const relationships = Object.entries(model.relationships)
+    const relationship = relationships.find(([relation, obj]) => obj.model === relatedRecord.type)
+
+    if (relationship) {
+      const [key, obj] = relationship
+
+      if (obj.type === 'hasOne') {
+        this.setRelationship(key, null)
+      }
+
+      if (obj.type === 'hasMany') {
+        if (this.hasRelationship(key)) {
+          const relatedCollection = record.relationships[key].data.filter(record => record.id !== relatedRecord.id)
+          this.setRelationship(key, relatedCollection)
+        }
+      }
+    } else {
+      throw new Error(`${relatedRecord.type} is not defined as a relation`)
+    }
+  }
+
   resetAttributes = (attributes, value = undefined) => {
     attributes.map(attribute => this.setAttribute(attribute, value))
   }
@@ -296,6 +356,8 @@ class Record extends PureComponent {
       state: this.state,
       setAttribute: this.setAttribute,
       setRelationship: this.setRelationship,
+      addRelationship: this.addRelationship,
+      removeRelationship: this.removeRelationship,
       resetAttributes: this.resetAttributes,
       setProperty: this.setPropertyByPath,
     })
@@ -385,6 +447,7 @@ Record.defaultProps = {
 Record.propTypes = {
   type: PropTypes.string,
   id: PropTypes.string,
+  schema: PropTypes.object,
   cache: PropTypes.oneOf([
     'only',
     'skip',
@@ -395,6 +458,9 @@ Record.propTypes = {
   updateRecord: PropTypes.func.isRequired,
   removeRecord: PropTypes.func.isRequired,
   related: PropTypes.bool,
-  relatedTo: PropTypes.object,
+  relatedTo: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.array,
+  ]),
   required: PropTypes.bool
 }

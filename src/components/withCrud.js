@@ -16,7 +16,7 @@ const withCrud = (WrappedComponent) => {
 
       return (
         <CrudContext.Consumer>
-          {(crud) => (
+          {({ schema, ...crud }) => (
             <Crud {...crud}
               beforeAdd={beforeAdd}
               onAdd={onAdd}
@@ -25,7 +25,7 @@ const withCrud = (WrappedComponent) => {
               beforeRemove={beforeRemove}
               onRemove={onRemove}>
               {(extendedCrud) => (
-                <WrappedComponent {...rest} {...extendedCrud} />
+                <WrappedComponent {...rest} schema={schema} {...extendedCrud} />
               )}
             </Crud>
           )}

@@ -61,15 +61,30 @@ export const memoizedGetExtendedRecord = createSelector(
   ({ props }) => props.removeRecord,
   ({ setAttribute }) => setAttribute,
   ({ setRelationship }) => setRelationship,
+  ({ addRelationship }) => addRelationship,
+  ({ removeRelationship }) => removeRelationship,
   ({ resetAttributes }) => resetAttributes,
   ({ setProperty }) => setProperty,
-  (record, addRecord, updateRecord, removeRecord, setAttribute, setRelationship, resetAttributes, setProperty) => {
+  (
+    record,
+    addRecord,
+    updateRecord,
+    removeRecord,
+    setAttribute,
+    setRelationship,
+    addRelationship,
+    removeRelationship,
+    resetAttributes,
+    setProperty
+  ) => {
     if (!record) return null
 
     return {
       ...record,
       setAttribute: curried(setAttribute),
       setRelationship: curried(setRelationship),
+      addRelationship,
+      removeRelationship,
       resetAttributes,
       setProperty,
       save: !record?.id

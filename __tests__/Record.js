@@ -1,7 +1,8 @@
 import React from 'react'
 import TestRenderer from 'react-test-renderer'
 import { Record, proceedIf, curried } from '../src/components/Record'
-import { earth, theMoon } from '../orbitStories/store'
+import { earth, theMoon, Venus } from '../orbitStories/store'
+import schema from '../orbitStories/schema'
 
 const contextFn = {
   buildRecord: (type) => ({
@@ -12,6 +13,36 @@ const contextFn = {
   updateRecord: jest.fn,
   removeRecord: jest.fn
 }
+
+describe('functions', () => {
+  test('proceedIf', () => {
+    expect(proceedIf(true, true, true)).toEqual(true)
+    expect(proceedIf(true, false, true)).toEqual(false)
+  })
+
+  test('curried', () => {
+    const testFn = () => 'test'
+    const curriedFn = curried(testFn)
+
+    expect(typeof curriedFn()).toEqual('function')
+    expect(typeof curriedFn()()).toEqual('string')
+  })
+
+  test('curried with args and callback', () => {
+    const testFn = (property, value) => value
+    const curriedFn = curried(testFn)
+
+    const test = {
+      name: 'Test',
+      doubleCheck: 'Check'
+    }
+
+    expect(curriedFn()('Test')).toEqual('Test')
+    expect(curriedFn('attribute', (test) => test.name)(test)).toEqual('Test')
+    expect(curriedFn('attribute', (test) => test.doubleCheck)(test)).toEqual('Check')
+    expect(curriedFn('attribute', (test) => test.doesNotExist)(test)).toEqual(undefined)
+  })
+})
 
 describe('Record', () => {
   const standardProps = {
@@ -29,6 +60,8 @@ describe('Record', () => {
     attributes: expect.any(Object),
     setAttribute: expect.any(Function),
     setRelationship: expect.any(Function),
+    addRelationship: expect.any(Function),
+    removeRelationship: expect.any(Function),
     resetAttributes: expect.any(Function),
     setProperty: expect.any(Function),
     save: expect.any(Function),
@@ -368,32 +401,141 @@ describe('Record', () => {
   })
 
   describe('methods', () => {
-    test('proceedIf', () => {
-      expect(proceedIf(true, true, true)).toEqual(true)
-      expect(proceedIf(true, false, true)).toEqual(false)
-    })
-
-    test('curried', () => {
-      const testFn = () => 'test'
-      const curriedFn = curried(testFn)
-
-      expect(typeof curriedFn()).toEqual('function')
-      expect(typeof curriedFn()()).toEqual('string')
-    })
-
-    test('curried with args and callback', () => {
-      const testFn = (property, value) => value
-      const curriedFn = curried(testFn)
-
-      const test = {
-        name: 'Test',
-        doubleCheck: 'Check'
+    describe('hasRelationship', () => {
+      const props = {
+        ...standardProps,
+        cache: 'only',
+        id: 'earth',
+        planet: {
+          ...earth
+        },
+        children: () => null,
+        schema,
       }
 
-      expect(curriedFn()('Test')).toEqual('Test')
-      expect(curriedFn('attribute', (test) => test.name)(test)).toEqual('Test')
-      expect(curriedFn('attribute', (test) => test.doubleCheck)(test)).toEqual('Check')
-      expect(curriedFn('attribute', (test) => test.doesNotExist)(test)).toEqual(undefined)
+      test('returns true if relationship exists', () => {
+        const root = TestRenderer.create(<Record {...props} />).root
+        const instance = root.instance
+
+        expect(instance.hasRelationship('sun')).toEqual(true)
+      })
+
+      test('returns false if relationship doesnt exists', () => {
+        const root = TestRenderer.create(<Record {...props} />).root
+        const instance = root.instance
+
+        expect(instance.hasRelationship('unknown')).toEqual(false)
+      })
+    })
+
+    describe('addRelationship', () => {
+      const props = {
+        ...standardProps,
+        cache: 'only',
+        id: 'earth',
+        planet: {
+          ...earth
+        },
+        children: () => null,
+        schema,
+      }
+
+      const wrongRelation = { type: 'wrong', id: 'theMoon' }
+      const hasOneRelation = { type: 'sun', id: 'alpha' }
+      const hasManyRelation = { type: 'moon', id: 'test' }
+
+      test('should create a hasOne relation if there isnt any', () => {
+        const root = TestRenderer.create(<Record {...props} />).root
+        const instance = root.instance
+
+        instance.addRelationship(hasOneRelation)
+        expect(instance.state.planet.relationships.sun.data).toEqual(hasOneRelation)
+      })
+
+      test('should replace a existing hasOne relation', () => {
+        const planet = {
+          ...earth,
+          relationships: {
+            sun: {
+              data: { type: 'sun', id: 'theSun'}
+            }
+          }
+        }
+
+        const root = TestRenderer.create(<Record {...props} planet={planet} />).root
+        const instance = root.instance
+
+        instance.addRelationship(hasOneRelation)
+        expect(instance.state.planet.relationships.sun.data).toEqual(hasOneRelation)
+      })
+
+      test('should create a hasMany relation if there isnt any', () => {
+        const root = TestRenderer.create(<Record {...props} planet={{ ...Venus }} />).root
+        const instance = root.instance
+
+        instance.addRelationship(hasManyRelation)
+        expect(instance.state.planet.relationships.moons.data).toEqual(expect.arrayContaining([ hasManyRelation ]))
+      })
+
+      test('should add a relation to a existing toMany relation', () => {
+        const planet = {
+          ...Venus,
+          relationships: {
+            moons: {
+              data: [ hasManyRelation ]
+            }
+          }
+        }
+
+        const root = TestRenderer.create(<Record {...props} planet={planet} />).root
+        const instance = root.instance
+
+        const secondHasManyRelation = { type: 'moon', id: 'test2' }
+
+        instance.addRelationship(secondHasManyRelation)
+        const relatedMoons = instance.state.planet.relationships.moons.data
+
+        expect(relatedMoons).toEqual(expect.arrayContaining([ hasManyRelation, secondHasManyRelation ]))
+        expect(relatedMoons.length).toEqual(2)
+      })
+    })
+
+    describe('removeRelationship', () => {
+      const props = {
+        ...standardProps,
+        cache: 'only',
+        id: 'earth',
+        planet: {
+          ...earth,
+          relationships: {
+            ...earth.relationships,
+            moons: {
+              data: [{ type: 'moon', id: 'theMoon' }]
+            }
+          }
+        },
+        children: () => null,
+        schema,
+      }
+
+      const hasOneRelation = { type: 'sun', id: 'theSun' }
+      const hasManyRelation = { type: 'moon', id: 'theMoon' }
+
+      test('should remove a hasOne relation', () => {
+        const root = TestRenderer.create(<Record {...props} />).root
+        const instance = root.instance
+
+        instance.removeRelationship(hasOneRelation)
+        expect(instance.state.planet.relationships.sun.data).toEqual(null)
+      })
+
+      test('should remove a hasMany relation', () => {
+        const root = TestRenderer.create(<Record {...props} />).root
+        const instance = root.instance
+
+        instance.removeRelationship(hasManyRelation)
+        expect(instance.state.planet.relationships.moons.data).toEqual([])
+      })
     })
   })
 })

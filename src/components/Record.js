@@ -341,6 +341,28 @@ class Record extends PureComponent {
     attributes.map(attribute => this.setAttribute(attribute, value))
   }
 
+  getRelatedIds = (relationship) => {
+    const { [this.props.type]: record } = this.state
+    const relation = record.relationships && record.relationships[relationship]
+
+    if (relation && Array.isArray(relation.data)) {
+      return relation.data.map(record => record.id)
+    } else {
+      return []
+    }
+  }
+
+  getRelatedId = (relationship) => {
+    const { [this.props.type]: record } = this.state
+    const relation = record.relationships && record.relationships[relationship]
+
+    if (relation && relation.data && relation.data.id) {
+      return relation.data.id
+    } else {
+      return null
+    }
+  }
+
   relatedToRecord = () => {
     const { relatedTo, type } = this.props
     const { [type]: record } = this.state
@@ -360,6 +382,8 @@ class Record extends PureComponent {
       removeRelationship: this.removeRelationship,
       resetAttributes: this.resetAttributes,
       setProperty: this.setPropertyByPath,
+      getRelatedIds: this.getRelatedIds,
+      getRelatedId: this.getRelatedId,
     })
   }
 

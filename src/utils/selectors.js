@@ -65,6 +65,8 @@ export const memoizedGetExtendedRecord = createSelector(
   ({ removeRelationship }) => removeRelationship,
   ({ resetAttributes }) => resetAttributes,
   ({ setProperty }) => setProperty,
+  ({ getRelatedIds }) => getRelatedIds,
+  ({ getRelatedId }) => getRelatedId,
   (
     record,
     addRecord,
@@ -75,7 +77,9 @@ export const memoizedGetExtendedRecord = createSelector(
     addRelationship,
     removeRelationship,
     resetAttributes,
-    setProperty
+    setProperty,
+    getRelatedIds,
+    getRelatedId,
   ) => {
     if (!record) return null
 
@@ -87,6 +91,8 @@ export const memoizedGetExtendedRecord = createSelector(
       removeRelationship,
       resetAttributes,
       setProperty,
+      getRelatedIds,
+      getRelatedId,
       save: !record?.id
       ? (...args) => addRecord({ ...record }, ...args)
       : (...args) => updateRecord({ ...record }, ...args),

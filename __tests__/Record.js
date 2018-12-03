@@ -64,6 +64,8 @@ describe('Record', () => {
     removeRelationship: expect.any(Function),
     resetAttributes: expect.any(Function),
     setProperty: expect.any(Function),
+    getRelatedIds: expect.any(Function),
+    getRelatedId: expect.any(Function),
     save: expect.any(Function),
     remove: expect.any(Function)
   }

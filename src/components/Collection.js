@@ -13,7 +13,7 @@ import {
 } from '../utils/selectors'
 
 export const notAllowedPropsCollection = ['id', 'type', 'related', 'relatedTo', 'children', 'queryStore', 'updateStore', 'plural',
-  'cache']
+  'cache', 'filter', 'sort', 'page']
 
 class Collection extends PureComponent {
   constructor (props) {

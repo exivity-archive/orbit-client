@@ -10,7 +10,7 @@ import {
 } from '../utils/selectors'
 
 export const notAllowedPropsRecord = ['id', 'type', 'related', 'relatedTo', 'children', 'queryStore', 'updateStore',
-'buildRecord', 'addRecord', 'updateRecord', 'removeRecord', 'cache']
+'buildRecord', 'addRecord', 'updateRecord', 'removeRecord', 'cache', 'queryOptions']
 
 const updateState = (props, state) => {
   const scenarios = {
@@ -220,7 +220,7 @@ class Record extends PureComponent {
   }
 
   queryStore = () => {
-    this.props.queryStore(this.query)
+    this.props.queryStore(this.query, this.props.queryOptions)
       .then(() => this.setState({
         performedQuery: true,
         loading: false,

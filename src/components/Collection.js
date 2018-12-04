@@ -13,7 +13,7 @@ import {
 } from '../utils/selectors'
 
 export const notAllowedPropsCollection = ['id', 'type', 'related', 'relatedTo', 'children', 'queryStore', 'updateStore', 'plural',
-  'cache', 'filter', 'sort', 'page']
+  'cache', 'filter', 'sort', 'page', 'queryOptions']
 
 class Collection extends PureComponent {
   constructor (props) {
@@ -68,7 +68,7 @@ class Collection extends PureComponent {
   }
 
   queryStore = () => {
-    this.props.queryStore(this.query)
+    this.props.queryStore(this.query, this.props.queryOptions)
       .then(this.checkRelations)
       .then((collection) => this.setState({
         [this.pluralizedType]: collection,

@@ -367,7 +367,7 @@ class Record extends PureComponent {
     const { relatedTo, type } = this.props
     const { [type]: record } = this.state
 
-    return !relatedTo && record?.id
+    return !relatedTo && record && record.id
       ? record
       : relatedTo
   }
@@ -403,7 +403,7 @@ class Record extends PureComponent {
       return React.cloneElement(
         this.props.children,
         {
-          key: `${type}-relatedTo-${relatedTo?.id}`,
+          key: `${type}-relatedTo-${!!relatedTo && relatedTo.id}`,
           ...this.getRecordAndHelpers(),
           relatedTo,
         }
@@ -430,7 +430,7 @@ const mapRecordsToProps = ({ id, type, related, relatedTo, cache }) => {
   return {}
 }
 
-const noRelation = (ownProps) => ownProps.related && !ownProps.relatedTo?.relationships[ownProps.type]
+const noRelation = (ownProps) => ownProps.related && ownProps.relatedTo && !ownProps.relatedTo.relationships[ownProps.type]
 
 const mergeProps = (record, ownProps) => {
   // Temporary fix for react-orbitjs not clearing last result when nothing is found

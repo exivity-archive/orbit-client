@@ -12,7 +12,15 @@ function getDisplayName(WrappedComponent) {
 const withCrud = (WrappedComponent) => {
   class ModelWithCrud extends PureComponent {
     render () {
-      const { beforeAdd, onAdd, beforeUpdate, onUpdate, beforeRemove, onRemove, ...rest } = this.props
+      const { 
+        beforeAdd, 
+        onAdd,
+        beforeUpdate, 
+        onUpdate, 
+        beforeRemove, 
+        onRemove, 
+        ...rest 
+      } = this.props
 
       return (
         <CrudContext.Consumer>

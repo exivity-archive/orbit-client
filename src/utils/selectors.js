@@ -94,9 +94,9 @@ export const memoizedGetExtendedRecord = createSelector(
       getRelatedIds,
       getRelatedId,
       save: record && !record.id
-      ? (...args) => addRecord({ ...record }, ...args)
-      : (...args) => updateRecord({ ...record }, ...args),
-      remove: (...args) => removeRecord({ ...record }, ...args)
+      ? (record, options) => addRecord(record, options)
+      : (record, options) => updateRecord(record, options),
+      remove: (record, options) => removeRecord(record, options)
   }
   }
 )

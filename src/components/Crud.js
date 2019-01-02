@@ -1,48 +1,63 @@
-import React, { PureComponent } from 'react'
+import { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 
+
 class Crud extends PureComponent {
-  build = (...args) => {
+  build = (type) => {
     const { buildRecord } = this.props
-    return buildRecord(...args)
+    return buildRecord(type)
   }
 
-  add = async (...args) => {
-    const { beforeAdd, addRecord, onAdd, onError } = this.props
+  isRecord = (record) => record.hasOwnProperty('type')
+
+  add = async (record, options) => {
+    const { beforeAdd, addRecord, onAdd, onError, extensions } = this.props
 
     if (beforeAdd) {
-      const proceed = await beforeAdd(...args)
-      const fnArgs = proceed === true ? args : proceed
+      const proceed = await beforeAdd(record, extensions)
+      const newRecord = this.isRecord(proceed) ? proceed : record
 
-      if (proceed) addRecord(...fnArgs).then(onAdd).catch(onError)
+      if (proceed) addRecord(newRecord, options)
+        .then((record) => onAdd(record, extensions))
+        .catch((error) => onError(error, extensions))
     } else {
-      addRecord(...args).then(onAdd).catch(onError)
+      addRecord(record, options)
+        .then((record) => onAdd(record, extensions))
+        .catch((error) => onError(error, extensions))
     }
   }
 
-  update = async (...args) => {
-    const { beforeUpdate, updateRecord, onUpdate, onError } = this.props
+  update = async (record, options) => {
+    const { beforeUpdate, updateRecord, onUpdate, onError, extensions } = this.props
 
     if (beforeUpdate) {
-      const proceed = await beforeUpdate(...args)
-      const fnArgs = proceed === true ? args : proceed
+      const proceed = await beforeUpdate(record, extensions)
+      const newRecord = this.isRecord(proceed) ? proceed : record
 
-      if (proceed) updateRecord(...fnArgs).then(onUpdate).catch(onError)
+      if (proceed) updateRecord(newRecord, options)
+        .then((record) => onUpdate(record, extensions))
+        .catch((error) => onError(error, extensions))
     } else {
-      updateRecord(...args).then(onUpdate).catch(onError)
+      updateRecord(record, options)
+        .then((record) => onUpdate(record, extensions))
+        .catch((error) => onError(error, extensions))
     }
   }
 
-  remove = async (...args) => {
-    const { beforeRemove, removeRecord, onRemove, onError } = this.props
+  remove = async (record, options) => {
+    const { beforeRemove, removeRecord, onRemove, onError, extensions } = this.props
 
     if (beforeRemove) {
-      const proceed = await beforeRemove(...args)
-      const fnArgs = proceed === true ? args : proceed
+      const proceed = await beforeRemove(record, extensions)
+      const newRecord = this.isRecord(proceed) ? proceed : record
 
-      if (proceed) removeRecord(...fnArgs).then(onRemove).catch(onError)
+      if (proceed) removeRecord(newRecord, options)
+        .then((record) => onRemove(record, extensions))
+        .catch((error) => onError(error, extensions))
     } else {
-      removeRecord(...args).then(onRemove).catch(onError)
+      removeRecord(record, options)
+        .then((record) => onRemove(record, extensions))
+        .catch((error) => onError(error, extensions))
     }
   }
 
@@ -86,6 +101,8 @@ Crud.propTypes = {
   beforeRemove: PropTypes.func,
   /** Callback called when one of crud function catches */
   onError: PropTypes.func,
+  /** Extensions which are provided with all callbacks */
+  extensions: PropTypes.object,
 }
 
 Crud.defaultProps = {
@@ -96,7 +113,8 @@ Crud.defaultProps = {
   onAdd: () => {},
   onUpdate: () => {},
   onRemove: () => {},
-  onError: () => {}
+  onError: () => {},
+  extensions: {}
 }
 
 export default Crud

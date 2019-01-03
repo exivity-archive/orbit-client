@@ -37,10 +37,10 @@ describe('functions', () => {
       doubleCheck: 'Check'
     }
 
-    expect(curriedFn()('Test')).toEqual('Test')
-    expect(curriedFn('attribute', (test) => test.name)(test)).toEqual('Test')
-    expect(curriedFn('attribute', (test) => test.doubleCheck)(test)).toEqual('Check')
-    expect(curriedFn('attribute', (test) => test.doesNotExist)(test)).toEqual(undefined)
+    expect(curriedFn('property')('Test')).toEqual('Test')
+    expect(curriedFn('attribute', 'Test')).toEqual('Test')
+    expect(curriedFn('attribute', 'Check')).toEqual('Check')
+    expect(curriedFn('attribute')()).toEqual(undefined)
   })
 })
 

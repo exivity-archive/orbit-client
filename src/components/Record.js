@@ -163,12 +163,8 @@ const updateStateRelated = (props, state) => {
 export const proceedIf = (...conditions) => conditions.every(condition => !!condition)
 
 export const curried = (fn) => (...args) => {
-  if (args.length === 2) {
-    if (typeof args[1] === 'function') return (value) => fn(args[0], args[1](value))
-    return () => fn(...args)
-  }
-
-  return (value) => fn(args[0], value)
+  if (args.length === 2) return fn(...args)
+  else return (value) => fn(...args, value)
 }
 
 class Record extends PureComponent {

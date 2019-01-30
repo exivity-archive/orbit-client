@@ -55,7 +55,7 @@ export const memoizedCollectionAndHelpers = createSelector(
 )
 
 export const memoizedGetExtendedRecord = createSelector(
-  ({ state, props }) => state[props.type],
+  ({ state }) => state.record,
   ({ props }) => props.addRecord,
   ({ props }) => props.updateRecord,
   ({ props }) => props.removeRecord,
@@ -79,7 +79,7 @@ export const memoizedGetExtendedRecord = createSelector(
     resetAttributes,
     setProperty,
     getRelatedIds,
-    getRelatedId,
+    getRelatedId
   ) => {
     if (!record) return null
 
@@ -107,7 +107,7 @@ export const memoizedGetRecordAndHelpers = createSelector(
   ({ state }) => state.error,
   ({ record }) => record,
   (props, loading, error, record) => {
-    const receivedEntities = omit(props, [...notAllowedPropsRecord, props.type])
+    const receivedEntities = omit(props, [...notAllowedPropsRecord, 'record'])
 
     return {
       [props.type]: record,

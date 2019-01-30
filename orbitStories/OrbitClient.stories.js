@@ -59,13 +59,13 @@ const PlanetForm = ({ planet, state }) => (
     }}>
       <label>Name:</label>
       <input value={planet.attributes.name}
-        onChange={planet.setAttribute('name', getValue)} />
+        onChange={(event) => planet.setAttribute('name', getValue(event))} />
       <label>Classification:</label>
       <input value={planet.attributes.classification}
-        onChange={planet.setAttribute('classification', getValue)} />
+        onChange={(event) => planet.setAttribute('classification', getValue(event))} />
       <label>Atmosphere:</label>
       <input type='checkbox' checked={planet.attributes.atmosphere}
-        onChange={planet.setAttribute('atmosphere', getChecked)} />
+        onChange={(event) => planet.setAttribute('atmosphere', getChecked(event))} />
       <button onClick={event => {
         event.preventDefault()
         planet.save()

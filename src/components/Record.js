@@ -13,11 +13,15 @@ export const notAllowedPropsRecord = ['id', 'type', 'related', 'relatedTo', 'chi
 'buildRecord', 'addRecord', 'updateRecord', 'removeRecord', 'cache', 'queryOptions']
 
 const updateState = (props, state) => {
+  // if (props.cache === 'skip' || (props.cache === 'auto' && !record)) {
+  //   return {}
+  // }
+
   const scenarios = {
     initializeRecord: !props.id && (props.id !== state.idReference),
     receivedNewId: !!props.id && (props.id !== state.idReference),
-    receivedNewRecord: !!props[props.type] && (props[props.type] !== state.recordReference),
-    recordNotFoundInCache: !!props.id && !props[props.type],
+    receivedNewRecord: !!props.record && (props.record !== state.recordReference),
+    recordNotFoundInCache: !!props.id && !props.record,
     cacheOnly: props.cache === 'only',
     loading: props.loading,
     error: !!props.error
@@ -26,7 +30,7 @@ const updateState = (props, state) => {
   if (scenarios.loading || scenarios.error) {
     return {
       recordReference: null,
-      [props.type]: null,
+      record: null,
       loading: !!props.loading ,
       error: props.error || false
     }
@@ -38,7 +42,7 @@ const updateState = (props, state) => {
     return {
       idReference: props.id,
       recordReference: record,
-      [props.type]: record,
+      record: record,
       loading: false,
       error: false
     }
@@ -49,7 +53,7 @@ const updateState = (props, state) => {
       return {
         idReference: props.id,
         recordReference: null,
-        [props.type]: null,
+        record: null,
         loading: !scenarios.cacheOnly,
         error: scenarios.cacheOnly
           ? { message: `${props.type} not found in cache` }
@@ -59,8 +63,8 @@ const updateState = (props, state) => {
 
     return {
       idReference: props.id,
-      recordReference: props[props.type],
-      [props.type]: props[props.type],
+      recordReference: props.record,
+      record: props.record,
       loading: false,
       error: false
     }
@@ -69,8 +73,8 @@ const updateState = (props, state) => {
   if (scenarios.receivedNewRecord) {
     return {
       idReference: props.id,
-      recordReference: props[props.type],
-      [props.type]: props[props.type],
+      recordReference: props.record,
+      record: props.record,
       loading: false,
       error: false
     }
@@ -82,9 +86,9 @@ const updateState = (props, state) => {
 const updateStateRelated = (props, state) => {
   const scenarios = {
     noRecordToRelateTo: !props.relatedTo,
-    relatedRecordNotFoundInCache: !!props.relatedTo && !props[props.type],
-    receivedNewRelatedRecord: !!props[props.type] && (props[props.type] !== state.recordReference),
-    noRelatedRecord: !props[props.type],
+    relatedRecordNotFoundInCache: !!props.relatedTo && !props.record,
+    receivedNewRelatedRecord: !!props.record && (props.record !== state.recordReference),
+    noRelatedRecord: !props.record,
     cacheOnly: props.cache === 'only',
     loading: props.loading,
     error: !!props.error
@@ -93,7 +97,7 @@ const updateStateRelated = (props, state) => {
   if (scenarios.loading || scenarios.error) {
     return {
       recordReference: null,
-      [props.type]: null,
+      record: null,
       loading: !!props.loading,
       error: props.error || false
     }
@@ -102,7 +106,7 @@ const updateStateRelated = (props, state) => {
   if (scenarios.noRecordToRelateTo) {
     return {
       recordReference: null,
-      [props.type]: null,
+      record: null,
       performedQuery: false,
       loading: false,
       error: false
@@ -113,14 +117,14 @@ const updateStateRelated = (props, state) => {
     if (!scenarios.cacheOnly && !state.performedQuery) {
       return {
         recordReference: null,
-        [props.type]: null,
+        record: null,
         loading: true,
         error: false
       }
     } else {
       return {
         recordReference: null,
-        [props.type]: null,
+        record: null,
         loading: false,
         error: false
       }
@@ -131,14 +135,14 @@ const updateStateRelated = (props, state) => {
     if (!scenarios.cacheOnly && !state.performedQuery) {
       return {
         recordReference: null,
-        [props.type]: null,
+        record: null,
         loading: true,
         error: false
       }
     } else {
       return {
         recordReference: null,
-        [props.type]: null,
+        record: null,
         loading: false,
         error: {
           message: `Related ${props.type} has not been found while being required`
@@ -149,8 +153,8 @@ const updateStateRelated = (props, state) => {
 
   if (scenarios.receivedNewRelatedRecord) {
     return {
-      recordReference: props[props.type],
-      [props.type]: props[props.type],
+      recordReference: props.record,
+      record: props.record,
       performedQuery: false,
       loading: false,
       error: false
@@ -236,29 +240,29 @@ class Record extends PureComponent {
   }
 
   setPropertyByPath = (path, value) => {
-    const newRecord = { ...this.state[this.props.type] }
+    const newRecord = { ...this.state.record }
 
     if (value) {
       return () => {
         this.findAndSetProperty(path, newRecord, value)
-        this.setState({ [this.props.type]: newRecord })
+        this.setState({ record: newRecord })
       }
     }
 
     return (value) => {
       this.findAndSetProperty(path, newRecord, value)
-      this.setState({ [this.props.type]: newRecord })  
+      this.setState({ record: newRecord })
     }
   }
 
   hasRelationship = (relationship) => {
-    const {[this.props.type]: record} = this.state
+    const { record } = this.state
 
     return record.relationships && !!record.relationships[relationship]
   }
 
-  setAttribute = (attribute, value) => this.setState(({[this.props.type]: record }) => ({
-    [this.props.type]: {
+  setAttribute = (attribute, value) => this.setState(({ record }) => ({
+    record: {
       ...record,
       attributes: {
         ...record.attributes,
@@ -267,8 +271,8 @@ class Record extends PureComponent {
     }
   }))
 
-  setRelationship = (relationship, value) => this.setState(({[this.props.type]: record }) => ({
-    [this.props.type]: {
+  setRelationship = (relationship, value) => this.setState(({ record }) => ({
+    record: {
       ...record,
       relationships: {
         ...record.relationships,
@@ -281,7 +285,7 @@ class Record extends PureComponent {
 
   addRelationship = (relatedRecord) => {
     const { schema, type } = this.props
-    const { [type]: record } = this.state
+    const { record } = this.state
 
     const model = schema.getModel(type)
     const relationships = Object.entries(model.relationships)
@@ -309,7 +313,7 @@ class Record extends PureComponent {
 
   removeRelationship = (relatedRecord) => {
     const { schema, type } = this.props
-    const { [type]: record } = this.state
+    const { record } = this.state
 
     const model = schema.getModel(type)
     const relationships = Object.entries(model.relationships)
@@ -338,7 +342,7 @@ class Record extends PureComponent {
   }
 
   getRelatedIds = (relationship) => {
-    const { [this.props.type]: record } = this.state
+    const { record } = this.state
     const relation = record.relationships && record.relationships[relationship]
 
     if (relation && Array.isArray(relation.data)) {
@@ -349,7 +353,7 @@ class Record extends PureComponent {
   }
 
   getRelatedId = (relationship) => {
-    const { [this.props.type]: record } = this.state
+    const { record } = this.state
     const relation = record.relationships && record.relationships[relationship]
 
     if (relation && relation.data && relation.data.id) {
@@ -360,8 +364,8 @@ class Record extends PureComponent {
   }
 
   relatedToRecord = () => {
-    const { relatedTo, type } = this.props
-    const { [type]: record } = this.state
+    const { relatedTo } = this.props
+    const { record } = this.state
 
     return !relatedTo && record && record.id
       ? record
@@ -416,11 +420,11 @@ const mapRecordsToProps = ({ id, type, related, relatedTo, cache }) => {
   }
 
   if (id) {
-    return { [type]: q => q.findRecord({ type, id }) }
+    return { record: q => q.findRecord({ type, id }) }
   }
 
   if (related && relatedTo) {
-    return { [type]: q => q.findRelatedRecord({ type: relatedTo.type, id: relatedTo.id }, type) }
+    return { record: q => q.findRelatedRecord({ type: relatedTo.type, id: relatedTo.id }, type) }
   }
 
   return {}
@@ -434,7 +438,7 @@ const mergeProps = (record, ownProps) => {
     return {
       ...record,
       ...ownProps,
-      [ownProps.type]: null
+      record: null
     }
   }
 
@@ -443,7 +447,7 @@ const mergeProps = (record, ownProps) => {
     return {
       ...record,
       ...ownProps,
-      [ownProps.type]: null
+      record: null
     }
   }
 

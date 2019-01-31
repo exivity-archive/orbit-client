@@ -3,7 +3,7 @@ import omit from 'lodash/omit'
 
 import { notAllowedPropsCollection } from '../components/Collection'
 import { notAllowedPropsRecord } from '../components/Record'
-import { curried } from '../components/Record'
+import { curried } from '../components/helpers'
 
 export const getIdsFromRelatedCollection = (relatedToCollection, ownType) => {
   return relatedToCollection.reduce((ids, record) => {
@@ -107,13 +107,18 @@ export const memoizedGetRecordAndHelpers = createSelector(
   ({ state }) => state.error,
   ({ record }) => record,
   (props, loading, error, record) => {
-    const receivedEntities = omit(props, [...notAllowedPropsRecord, 'record'])
+    const receivedEntities = omit(props, [...notAllowedPropsRecord, 'record', 'loading', 'error', 'initialRecord'])
 
-    return {
-      [props.type]: record,
-      ...receivedEntities,
-      loading,
-      error
-    }
+    return props.initialRecord
+      ? {
+        [props.type]: record,
+        ...receivedEntities
+      }
+      : {
+        [props.type]: record,
+        ...receivedEntities,
+        loading,
+        error
+      }
   }
 )

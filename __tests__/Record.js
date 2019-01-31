@@ -1,6 +1,7 @@
 import React from 'react'
 import TestRenderer from 'react-test-renderer'
-import { Record, proceedIf, curried } from '../src/components/Record'
+import { Record } from '../src/components/Record'
+import { curried } from '../src/components/helpers'
 import { earth, theMoon, Venus } from '../orbitStories/store'
 import schema from '../orbitStories/schema'
 
@@ -15,11 +16,6 @@ const contextFn = {
 }
 
 describe('functions', () => {
-  test('proceedIf', () => {
-    expect(proceedIf(true, true, true)).toEqual(true)
-    expect(proceedIf(true, false, true)).toEqual(false)
-  })
-
   test('curried', () => {
     const testFn = () => 'test'
     const curriedFn = curried(testFn)
@@ -45,11 +41,6 @@ describe('Record', () => {
     ...contextFn
   }
 
-  const state = {
-    idReference: null,
-    recordReference: null,
-  }
-
   const extendedRecord = {
     type: expect.any(String),
     attributes: expect.any(Object),
@@ -65,232 +56,12 @@ describe('Record', () => {
     remove: expect.any(Function)
   }
 
-  describe('getDerivedStateFromProps scenarios', () => {
-    test('no changes', () => {})
-    test('initialize record', () => {
-      const props = {
-        ...standardProps,
-        id: undefined
-      }
-
-      const result = Record.getDerivedStateFromProps(props, state)
-
-      expect(result.idReference).toEqual(undefined)
-      expect(result.recordReference).toBe(result.record)
-      expect(result.record.type).toEqual('planet')
-      expect(result.loading).toEqual(false)
-      expect(result.error).toEqual(false)
-      expect(Object.keys(result).length).toEqual(5)
-    })
-
-    describe('cache only', () => {
-      test('record not found', () => {
-        const props = {
-          ...standardProps,
-          cache: 'only',
-          id: 'earth'
-        }
-
-        const result = Record.getDerivedStateFromProps(props, state)
-
-        expect(result.idReference).toEqual('earth')
-        expect(result.recordReference).toEqual(null)
-        expect(result.record).toEqual(null)
-        expect(result.loading).toEqual(false)
-        expect(result.error.message).toEqual('planet not found in cache')
-        expect(Object.keys(result).length).toEqual(5)
-      })
-
-      test('record found', () => {
-        const props = {
-          ...standardProps,
-          cache: 'only',
-          id: 'earth',
-          record: {
-            ...earth
-          }
-        }
-
-        const result = Record.getDerivedStateFromProps(props, state)
-
-        expect(result.idReference).toEqual('earth')
-        expect(result.recordReference).toBe(props.record)
-        expect(result.record.id).toEqual('earth')
-        expect(result.loading).toEqual(false)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(5)
-      })
-
-      test('updated record', () => {
-        const props = {
-          ...standardProps,
-          cache: 'only',
-          id: 'earth',
-          record: {
-            ...earth
-          }
-        }
-
-        const oldState = {
-          ...state,
-          record: {
-            id: 'earth'
-          }
-        }
-
-        const result = Record.getDerivedStateFromProps(props, oldState)
-
-        expect(result.idReference).toEqual('earth')
-        expect(result.recordReference).toBe(props.record)
-        expect(result.record).toBe(props.record)
-        expect(result.record).not.toBe(oldState.record)
-        expect(result.loading).toEqual(false)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(5)
-      })
-    })
-
-    describe('cache skip', () => {
-      test('record not found', () => {
-        const props = {
-          ...standardProps,
-          cache: 'skip',
-          id: 'earth'
-        }
-
-        const result = Record.getDerivedStateFromProps(props, state)
-
-        expect(result.idReference).toEqual('earth')
-        expect(result.recordReference).toEqual(null)
-        expect(result.record).toEqual(null)
-        expect(result.loading).toEqual(true)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(5)
-      })
-
-      test('record found', () => {
-        const props = {
-          ...standardProps,
-          cache: 'skip',
-          id: 'earth',
-          record: {
-            id: 'earth',
-          }
-        }
-
-        const result = Record.getDerivedStateFromProps(props, state)
-
-        expect(result.idReference).toEqual('earth')
-        expect(result.recordReference).toBe(props.record)
-        expect(result.record.id).toEqual('earth')
-        expect(result.loading).toEqual(false)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(5)
-      })
-
-      test('updated record', () => {
-        const props = {
-          ...standardProps,
-          cache: 'skip',
-          id: 'earth',
-          record: {
-            id: 'earth'
-          }
-        }
-
-        const oldState = {
-          ...state,
-          record: {
-            id: 'earth'
-          }
-        }
-
-        const result = Record.getDerivedStateFromProps(props, oldState)
-
-        expect(result.idReference).toEqual('earth')
-        expect(result.recordReference).toBe(props.record)
-        expect(result.record).toBe(props.record)
-        expect(result.record).not.toBe(oldState.record)
-        expect(result.loading).toEqual(false)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(5)
-      })
-    })
-
-    describe('cache auto', () => {
-      test('record not found', () => {
-        const props = {
-          ...standardProps,
-          cache: 'auto',
-          id: 'earth'
-        }
-
-        const result = Record.getDerivedStateFromProps(props, state)
-
-        expect(result.idReference).toEqual('earth')
-        expect(result.recordReference).toEqual(null)
-        expect(result.record).toEqual(null)
-        expect(result.loading).toEqual(true)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(5)
-      })
-
-      test('record found', () => {
-        const props = {
-          ...standardProps,
-          cache: 'auto',
-          id: 'earth',
-          record: {
-            id: 'earth',
-          }
-        }
-
-        const result = Record.getDerivedStateFromProps(props, state)
-
-        expect(result.idReference).toEqual('earth')
-        expect(result.recordReference).toBe(props.record)
-        expect(result.record.id).toEqual('earth')
-        expect(result.loading).toEqual(false)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(5)
-      })
-
-      test('updated record', () => {
-        const props = {
-          ...standardProps,
-          cache: 'auto',
-          id: 'earth',
-          record: {
-            id: 'earth'
-          }
-        }
-
-        const oldState = {
-          ...state,
-          record: {
-            id: 'earth'
-          }
-        }
-
-        const result = Record.getDerivedStateFromProps(props, oldState)
-
-        expect(result.idReference).toEqual('earth')
-        expect(result.recordReference).toBe(props.record)
-        expect(result.record).toBe(props.record)
-        expect(result.record).not.toBe(oldState.record)
-        expect(result.loading).toEqual(false)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(5)
-      })
-    })
-  })
-
   describe('record output', () => {
     const props = {
       ...standardProps,
       cache: 'only',
       id: 'earth',
-      record: {
+      initialRecord: {
         ...earth
       }
     }
@@ -298,7 +69,7 @@ describe('Record', () => {
     const propsMoon = {
       id: theMoon.id,
       type: 'moon',
-      record: theMoon,
+      initialRecord: theMoon,
       cache: 'only',
       ...contextFn
     }
@@ -315,48 +86,7 @@ describe('Record', () => {
 
       expect(childrenArgs.planet).not.toBe(props.record)
       expect(childrenArgs.planet).toEqual(expect.objectContaining(extendedRecord))
-      expect(childrenArgs.loading).toEqual(false)
-      expect(childrenArgs.error).toEqual(false)
-      expect(keys.length).toEqual(3)
-    })
-
-    test('children callback args when loading', () => {
-      let childrenArgs, keys
-      TestRenderer.create(
-        <Record {...props} loading>
-          <Record {...propsMoon} children={(args) => {
-            childrenArgs = args
-            keys = Object.keys(args)
-            return null
-          }} />
-        </Record>
-      )
-
-      expect(childrenArgs.planet).toEqual(null)
-      expect(childrenArgs.moon).toEqual(null)
-      expect(childrenArgs.loading).toEqual(true)
-      expect(childrenArgs.error).toEqual(false)
-      expect(keys.length).toEqual(4)
-    })
-
-    test('children callback args when error', () => {
-      const error = { message: 'record not found' }
-      let childrenArgs, keys
-      TestRenderer.create(
-        <Record {...props} error={error}>
-          <Record {...propsMoon} children={(args) => {
-            childrenArgs = args
-            keys = Object.keys(args)
-            return null
-          }} />
-        </Record>
-      )
-
-      expect(childrenArgs.planet).toEqual(null)
-      expect(childrenArgs.moon).toEqual(null)
-      expect(childrenArgs.loading).toEqual(false)
-      expect(childrenArgs.error).toEqual(error)
-      expect(keys.length).toEqual(4)
+      expect(keys.length).toEqual(1)
     })
 
     test('child merges callback args with args of parent', () => {
@@ -373,9 +103,7 @@ describe('Record', () => {
 
       expect(childrenArgs.planet).toEqual(expect.objectContaining(extendedRecord))
       expect(childrenArgs.moon).toEqual(expect.objectContaining(extendedRecord))
-      expect(childrenArgs.loading).toEqual(false)
-      expect(childrenArgs.error).toEqual(false)
-      expect(keys.length).toEqual(4)
+      expect(keys.length).toEqual(2)
     })
 
     test('found records are passed back into args extended and pure', () => {
@@ -403,7 +131,7 @@ describe('Record', () => {
         ...standardProps,
         cache: 'only',
         id: 'earth',
-        record: {
+        initialRecord: {
           ...earth
         },
         children: () => null,
@@ -430,14 +158,13 @@ describe('Record', () => {
         ...standardProps,
         cache: 'only',
         id: 'earth',
-        record: {
+        initialRecord: {
           ...earth
         },
         children: () => null,
-        schema,
+        schema
       }
 
-      const wrongRelation = { type: 'wrong', id: 'theMoon' }
       const hasOneRelation = { type: 'sun', id: 'alpha' }
       const hasManyRelation = { type: 'moon', id: 'test' }
 
@@ -459,7 +186,7 @@ describe('Record', () => {
           }
         }
 
-        const root = TestRenderer.create(<Record {...props} record={record} />).root
+        const root = TestRenderer.create(<Record {...props} initialRecord={record} />).root
         const instance = root.instance
 
         instance.addRelationship(hasOneRelation)
@@ -467,7 +194,7 @@ describe('Record', () => {
       })
 
       test('should create a hasMany relation if there isnt any', () => {
-        const root = TestRenderer.create(<Record {...props} record={{ ...Venus }} />).root
+        const root = TestRenderer.create(<Record {...props} initialRecord={{ ...Venus }} />).root
         const instance = root.instance
 
         instance.addRelationship(hasManyRelation)
@@ -484,7 +211,7 @@ describe('Record', () => {
           }
         }
 
-        const root = TestRenderer.create(<Record {...props} record={record} />).root
+        const root = TestRenderer.create(<Record {...props} initialRecord={record} />).root
         const instance = root.instance
 
         const secondHasManyRelation = { type: 'moon', id: 'test2' }
@@ -502,7 +229,7 @@ describe('Record', () => {
         ...standardProps,
         cache: 'only',
         id: 'earth',
-        record: {
+        initialRecord: {
           ...earth,
           relationships: {
             ...earth.relationships,
@@ -534,326 +261,5 @@ describe('Record', () => {
         expect(instance.state.record.relationships.moons.data).toEqual([])
       })
     })
-  })
-})
-
-describe('Related record', () => {
-  const standardProps = {
-    id: undefined,
-    type: 'moon',
-    related: true,
-    ...contextFn
-  }
-
-  const state = {
-    recordReference: null,
-  }
-
-  describe('getDerivedStateFromProps scenarios', () => {
-    describe('cache only', () => {
-      test('no record to relate to', () => {
-        const props = {
-          ...standardProps,
-          cache: 'only',
-          relatedTo: null
-        }
-
-        const result = Record.getDerivedStateFromProps(props, state)
-
-        expect(result.recordReference).toEqual(null)
-        expect(result.record).toEqual(null)
-        expect(result.performedQuery).toEqual(false)
-        expect(result.loading).toEqual(false)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(5)
-      })
-
-      test('related record not found when not required', () => {
-        const props = {
-          ...standardProps,
-          cache: 'only',
-          relatedTo: { type: 'planet', id: 'earth' }
-        }
-
-        const result = Record.getDerivedStateFromProps(props, state)
-
-        expect(result.recordReference).toEqual(null)
-        expect(result.record).toEqual(null)
-        expect(result.loading).toEqual(false)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(4)
-      })
-
-      test('related record not found when required', () => {
-        const props = {
-          ...standardProps,
-          cache: 'only',
-          relatedTo: { type: 'planet', id: 'earth' },
-          required: true
-        }
-
-        const result = Record.getDerivedStateFromProps(props, state)
-
-        expect(result.recordReference).toEqual(null)
-        expect(result.record).toEqual(null)
-        expect(result.loading).toEqual(false)
-        expect(result.error.message).toEqual('Related moon has not been found while being required')
-        expect(Object.keys(result).length).toEqual(4)
-      })
-
-      test('related record found', () => {
-        const props = {
-          ...standardProps,
-          cache: 'only',
-          relatedTo: { type: 'planet', id: 'earth' },
-          record: { type: 'moon', id: 'theMoon' }
-        }
-
-        const result = Record.getDerivedStateFromProps(props, state)
-
-        expect(result.recordReference).toBe(props.record)
-        expect(result.record).toBe(props.record)
-        expect(result.performedQuery).toEqual(false)
-        expect(result.loading).toEqual(false)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(5)
-      })
-
-      test('updated related record', () => {
-        const props = {
-          ...standardProps,
-          cache: 'only',
-          relatedTo: { type: 'planet', id: 'earth' },
-          record: { type: 'moon', id: 'theMoon' }
-        }
-
-        const oldState = {
-          ...state,
-          record: {
-            type: 'moon',
-            id: 'theMoon'
-          }
-        }
-
-        const result = Record.getDerivedStateFromProps(props, oldState)
-
-        expect(result.recordReference).toBe(props.record)
-        expect(result.recordReference).not.toBe(oldState.record)
-        expect(result.record).toBe(props.record)
-        expect(result.record).not.toBe(oldState.record)
-        expect(result.performedQuery).toEqual(false)
-        expect(result.loading).toEqual(false)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(5)
-      })
-    })
-
-    describe('cache skip', () => {
-      test('no record to relate to', () => {
-        const props = {
-          ...standardProps,
-          cache: 'skip',
-          relatedTo: null
-        }
-
-        const result = Record.getDerivedStateFromProps(props, state)
-
-        expect(result.recordReference).toEqual(null)
-        expect(result.record).toEqual(null)
-        expect(result.performedQuery).toEqual(false)
-        expect(result.loading).toEqual(false)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(5)
-      })
-
-      test('related record not found when not required', () => {
-        const props = {
-          ...standardProps,
-          cache: 'skip',
-          relatedTo: { type: 'planet', id: 'earth' }
-        }
-
-        const result = Record.getDerivedStateFromProps(props, state)
-
-        expect(result.recordReference).toEqual(null)
-        expect(result.record).toEqual(null)
-        expect(result.loading).toEqual(true)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(4)
-      })
-
-      test('related record not found when required', () => {
-        const props = {
-          ...standardProps,
-          cache: 'skip',
-          relatedTo: { type: 'planet', id: 'earth' },
-          required: true
-        }
-
-        const result = Record.getDerivedStateFromProps(props, state)
-
-        expect(result.recordReference).toEqual(null)
-        expect(result.record).toEqual(null)
-        expect(result.loading).toEqual(true)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(4)
-      })
-
-      test('related record not found when required and all sources searched', () => {
-        const props = {
-          ...standardProps,
-          cache: 'skip',
-          relatedTo: { type: 'planet', id: 'earth' },
-          required: true
-        }
-
-        const oldState = {
-          ...state,
-          performedQuery: true,
-        }
-
-        const result = Record.getDerivedStateFromProps(props, oldState)
-
-        expect(result.recordReference).toEqual(null)
-        expect(result.record).toEqual(null)
-        expect(result.loading).toEqual(false)
-        expect(result.error.message).toEqual(`Related moon has not been found while being required`)
-        expect(Object.keys(result).length).toEqual(4)
-      })
-
-      test('updated related record', () => {
-        const props = {
-          ...standardProps,
-          cache: 'skip',
-          relatedTo: { type: 'planet', id: 'earth' },
-          record: { type: 'moon', id: 'theMoon' }
-        }
-
-        const oldState = {
-          ...state,
-          record: {
-            type: 'moon',
-            id: 'theMoon'
-          }
-        }
-
-        const result = Record.getDerivedStateFromProps(props, oldState)
-
-        expect(result.recordReference).toBe(props.record)
-        expect(result.recordReference).not.toBe(oldState.record)
-        expect(result.record).toBe(props.record)
-        expect(result.record).not.toBe(oldState.record)
-        expect(result.performedQuery).toEqual(false)
-        expect(result.loading).toEqual(false)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(5)
-      })
-    })
-
-    describe('cache auto', () => {
-      test('no record to relate to', () => {
-        const props = {
-          ...standardProps,
-          cache: 'auto',
-          relatedTo: null
-        }
-
-        const result = Record.getDerivedStateFromProps(props, state)
-
-        expect(result.recordReference).toEqual(null)
-        expect(result.record).toEqual(null)
-        expect(result.performedQuery).toEqual(false)
-        expect(result.loading).toEqual(false)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(5)
-      })
-
-      test('related record not found when not required', () => {
-        const props = {
-          ...standardProps,
-          cache: 'auto',
-          relatedTo: { type: 'planet', id: 'earth' }
-        }
-
-        const result = Record.getDerivedStateFromProps(props, state)
-
-        expect(result.recordReference).toEqual(null)
-        expect(result.record).toEqual(null)
-        expect(result.loading).toEqual(true)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(4)
-      })
-
-      test('related record not found when required', () => {
-        const props = {
-          ...standardProps,
-          cache: 'auto',
-          relatedTo: { type: 'planet', id: 'earth' },
-          required: true
-        }
-
-        const result = Record.getDerivedStateFromProps(props, state)
-
-        expect(result.recordReference).toEqual(null)
-        expect(result.record).toEqual(null)
-        expect(result.loading).toEqual(true)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(4)
-      })
-
-      test('related record not found when required and all sources searched', () => {
-        const props = {
-          ...standardProps,
-          cache: 'auto',
-          relatedTo: { type: 'planet', id: 'earth' },
-          required: true
-        }
-
-        const oldState = {
-          ...state,
-          performedQuery: true,
-        }
-
-        const result = Record.getDerivedStateFromProps(props, oldState)
-
-        expect(result.recordReference).toEqual(null)
-        expect(result.record).toEqual(null)
-        expect(result.loading).toEqual(false)
-        expect(result.error.message).toEqual(`Related moon has not been found while being required`)
-        expect(Object.keys(result).length).toEqual(4)
-      })
-
-      test('updated related record', () => {
-        const props = {
-          ...standardProps,
-          cache: 'auto',
-          relatedTo: { type: 'planet', id: 'earth' },
-          record: { type: 'moon', id: 'theMoon' }
-        }
-
-        const oldState = {
-          ...state,
-          record: {
-            type: 'moon',
-            id: 'theMoon'
-          }
-        }
-
-        const result = Record.getDerivedStateFromProps(props, oldState)
-
-        expect(result.recordReference).toBe(props.record)
-        expect(result.recordReference).not.toBe(oldState.record)
-        expect(result.record).toBe(props.record)
-        expect(result.record).not.toBe(oldState.record)
-        expect(result.performedQuery).toEqual(false)
-        expect(result.loading).toEqual(false)
-        expect(result.error).toEqual(false)
-        expect(Object.keys(result).length).toEqual(5)
-      })
-    })
-  })
-
-  describe('related record output', () => {
-
   })
 })

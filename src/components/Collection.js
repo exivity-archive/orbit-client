@@ -57,18 +57,18 @@ class Collection extends PureComponent {
     }, query)
   }
 
-  query = (query) => {
-    const { related, relatedTo, type } = this.props
+  query = () => {
+    const { related, relatedTo, type, sort, filter, page } = this.props
 
     if (related && relatedTo && !this.isRelatedToCollection()) {
-      return query.findRelatedRecords({ type: relatedTo.type, id: relatedTo.id }, this.pluralizedType)
+      return (query) => query.findRelatedRecords({ type: relatedTo.type, id: relatedTo.id }, this.pluralizedType)
     }
 
-    return query.findRecords(type)
+    return  decorateQuery((query) => query.findRecords(type), { sort, filter, page })
   }
 
   queryStore = () => {
-    this.props.queryStore(this.query, this.props.queryOptions)
+    this.props.queryStore(this.query(), this.props.queryOptions)
       .then(this.checkRelations)
       .then((collection) => this.setState({
         [this.pluralizedType]: collection,
@@ -139,10 +139,6 @@ class Collection extends PureComponent {
 const mapRecordsToProps = ({ type, plural, cache, related, relatedTo, sort, filter, page }) => {
   const pluralizedType = plural || pluralize(type)
 
-  if (cache === 'skip') {
-    return {}
-  }
-
   if (related && Array.isArray(relatedTo)) {
     return {
       [pluralizedType]: q => q.findRecords(type)
@@ -167,13 +163,6 @@ const mapRecordsToProps = ({ type, plural, cache, related, relatedTo, sort, filt
 // Temp workaround for react-orbitjs not being able to handle other returns then functions
 const mergeProps = (record, ownProps) => {
   const pluralizedType = ownProps.plural || pluralize(ownProps.type)
-
-  if (ownProps.cache === 'skip') {
-    return {
-      ...record,
-      ...ownProps
-    }
-  }
 
   if (ownProps.related && Array.isArray(ownProps.relatedTo)) {
     const collection = getRelatedRecords({ ownProps, record, pluralizedType })
@@ -201,7 +190,15 @@ const mergeProps = (record, ownProps) => {
 
 export { Collection }
 
-export default withData(mapRecordsToProps, mergeProps)(Collection)
+const WithData = withData(mapRecordsToProps, mergeProps)(Collection)
+
+export default (props) => {
+  if (props.cache === 'skip') {
+    return <Collection {...props} />
+  } else {
+    return <WithData {...props} />
+  }
+}
 
 Collection.displayName = 'Collection'
 

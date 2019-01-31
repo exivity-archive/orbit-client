@@ -59,13 +59,13 @@ const PlanetForm = ({ planet, state }) => (
     }}>
       <label>Name:</label>
       <input value={planet.attributes.name}
-        onChange={planet.setAttribute('name', getValue)} />
+        onChange={(event) => planet.setAttribute('name', getValue(event))} />
       <label>Classification:</label>
       <input value={planet.attributes.classification}
-        onChange={planet.setAttribute('classification', getValue)} />
+        onChange={(event) => planet.setAttribute('classification', getValue(event))} />
       <label>Atmosphere:</label>
       <input type='checkbox' checked={planet.attributes.atmosphere}
-        onChange={planet.setAttribute('atmosphere', getChecked)} />
+        onChange={(event) => planet.setAttribute('atmosphere', getChecked(event))} />
       <button onClick={event => {
         event.preventDefault()
         planet.save()
@@ -190,9 +190,7 @@ storiesOf('components|orbit-client', module)
           })
           setTimeout(() => storeState({ planetId: undefined }), 2000)
         }} cache='only'>
-        {({ planet, loading, error }) => {
-          if (error) return error.message
-          if (loading) return 'Loading'
+        {({ planet }) => {
           if (!planet) return 'no record found in cache'
           return (
             <Container>
@@ -214,10 +212,8 @@ storiesOf('components|orbit-client', module)
       <Planet id={state.planetId} cache='only'>
         <Moons related cache='only'>
           <Sun related cache='only'>
-            {(props) => {
-              const { planet, moons, sun, loading, error } = props
-              if (error) return error.message
-              if (loading) return 'Loading'
+            {({ planet, moons, sun }) => {
+              console.log(planet)
               if (!planet) return 'no record found in cache'
               return (
                 <Container>
@@ -243,9 +239,9 @@ storiesOf('components|orbit-client', module)
               {planets.map(planet => <li key={planet.id}>{planet.id}</li>)}
             </ul>
             <button onClick={() => save([
-              { type: 'planet', id: 'mars', attributes: { name: 'Mars'} },
-              { type: 'planet', id: 'exivity to the moon', attributes: { name: 'Rocket'}  },
-              { type: 'planet', id: 'neptunus', attributes: { name: 'Neptunusr'} }
+              { type: 'planet', id: 'mars', attributes: { name: 'Mars' } },
+              { type: 'planet', id: 'exivity to the moon', attributes: { name: 'Rocket' }  },
+              { type: 'planet', id: 'neptunus', attributes: { name: 'Neptunus' } }
             ])}>Create records</button>
             <button onClick={() => remove(planets)}>Delete all records</button>
             <button onClick={() => {

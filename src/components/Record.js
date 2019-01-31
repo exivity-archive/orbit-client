@@ -13,9 +13,13 @@ export const notAllowedPropsRecord = ['id', 'type', 'related', 'relatedTo', 'chi
 'buildRecord', 'addRecord', 'updateRecord', 'removeRecord', 'cache', 'queryOptions']
 
 const updateState = (props, state) => {
-  // if (props.cache === 'skip' || (props.cache === 'auto' && !record)) {
-  //   return {}
-  // }
+  if (props.cache === 'skip') {
+    return {
+      record: null,
+      loading: true,
+      error: false
+    }
+  }
 
   const scenarios = {
     initializeRecord: !props.id && (props.id !== state.idReference),
@@ -198,8 +202,8 @@ class Record extends PureComponent {
   }
 
   shouldQuery = () => {
-    const { cache, type, related, relatedTo } = this.props
-    const { performedQuery, [type]: record, loading, error } = this.state
+    const { cache, related, relatedTo } = this.props
+    const { performedQuery, record, loading, error } = this.state
 
     return proceedIf(
       related && relatedTo,
@@ -415,10 +419,6 @@ class Record extends PureComponent {
 }
 
 const mapRecordsToProps = ({ id, type, related, relatedTo, cache }) => {
-  if (cache === 'skip') {
-    return {}
-  }
-
   if (id) {
     return { record: q => q.findRecord({ type, id }) }
   }
@@ -461,11 +461,19 @@ export { Record }
 
 const WithCrud = withCrud(Record)
 
-export default withData(mapRecordsToProps, mergeProps)(WithCrud)
+const WithData = withData(mapRecordsToProps, mergeProps)(WithCrud)
+
+export default (props) => {
+  if (props.cache === 'skip') {
+    return <WithCrud {...props} />
+  } else {
+    return <WithData {...props} />
+  }
+}
 
 Record.defaultProps = {
   relatedTo: null,
-  cache: 'auto',
+  cache: 'only',
 }
 
 Record.propTypes = {
@@ -474,8 +482,7 @@ Record.propTypes = {
   schema: PropTypes.object,
   cache: PropTypes.oneOf([
     'only',
-    'skip',
-    'auto'
+    'skip'
   ]),
   buildRecord: PropTypes.func.isRequired,
   addRecord: PropTypes.func.isRequired,

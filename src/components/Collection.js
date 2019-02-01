@@ -190,15 +190,7 @@ const mergeProps = (record, ownProps) => {
 
 export { Collection }
 
-const WithData = withData(mapRecordsToProps, mergeProps)(Collection)
-
-export default (props) => {
-  if (props.cache === 'skip') {
-    return <Collection {...props} />
-  } else {
-    return <WithData {...props} />
-  }
-}
+export default withData(mapRecordsToProps, mergeProps)(Collection)
 
 Collection.displayName = 'Collection'
 

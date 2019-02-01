@@ -20,7 +20,13 @@ describe('Collection', () => {
 
   const planets = [ earth ]
 
-  const collectionAndHelpersShape = {
+  const collectionAndHelpersCacheOnlyShape = {
+    moons: props.moons,
+    save: expect.any(Function),
+    remove: expect.any(Function)
+  }
+
+  const collectionAndHelpersCacheSkipShape = {
     moons: props.moons,
     save: expect.any(Function),
     remove: expect.any(Function),
@@ -30,7 +36,7 @@ describe('Collection', () => {
 
   const withReceivedEntities = {
     planets,
-    ...collectionAndHelpersShape,
+    ...collectionAndHelpersCacheOnlyShape,
   }
 
   describe('cache only', () => {
@@ -54,7 +60,7 @@ describe('Collection', () => {
         const collectionAndHelpers = instance.getCollectionAndHelpers()
 
         expect(collectionAndHelpers.moons.length).toEqual(2)
-        expect(collectionAndHelpers).toEqual(expect.objectContaining(collectionAndHelpersShape))
+        expect(collectionAndHelpers).toEqual(expect.objectContaining(collectionAndHelpersCacheOnlyShape))
       })
 
       test('getCollectionAndHelpers uses memoization', () => {
@@ -104,54 +110,9 @@ describe('Collection', () => {
         )
 
         expect(childrenArgs.moons).toBe(props.moons)
-        expect(childrenArgs.loading).toEqual(false)
-        expect(childrenArgs.error).toEqual(false)
         expect(childrenArgs.save).toEqual(expect.any(Function))
         expect(childrenArgs.remove).toEqual(expect.any(Function))
-        expect(keys.length).toEqual(5)
-      })
-
-      test('children callback args when loading', () => {
-        let childrenArgs, keys
-        TestRenderer.create(
-          <Collection {...props} {...mocks} loading>
-            <Collection {...propsPlanets} {...mocks} children={(args) => {
-              childrenArgs = args
-              keys = Object.keys(args)
-              return null
-            }} />
-          </Collection>
-        )
-
-        expect(childrenArgs.planets).toEqual(null)
-        expect(childrenArgs.moons).toEqual(null)
-        expect(childrenArgs.loading).toEqual(true)
-        expect(childrenArgs.error).toEqual(false)
-        expect(childrenArgs.save).toEqual(expect.any(Function))
-        expect(childrenArgs.remove).toEqual(expect.any(Function))
-        expect(keys.length).toEqual(6)
-      })
-
-      test('children callback args when error', () => {
-        const error = { message: 'query failed' }
-        let childrenArgs, keys
-        TestRenderer.create(
-          <Collection {...props} {...mocks} error={error}>
-            <Collection {...propsPlanets} {...mocks} children={(args) => {
-              childrenArgs = args
-              keys = Object.keys(args)
-              return null
-            }} />
-          </Collection>
-        )
-
-        expect(childrenArgs.planets).toEqual(null)
-        expect(childrenArgs.moons).toEqual(null)
-        expect(childrenArgs.loading).toEqual(false)
-        expect(childrenArgs.error).toEqual({ message: 'query failed' })
-        expect(childrenArgs.save).toEqual(expect.any(Function))
-        expect(childrenArgs.remove).toEqual(expect.any(Function))
-        expect(keys.length).toEqual(6)
+        expect(keys.length).toEqual(3)
       })
 
       test('child merges callback args with args of parent', () => {
@@ -168,11 +129,9 @@ describe('Collection', () => {
 
         expect(childrenArgs.planets).toBe(propsPlanets.planets)
         expect(childrenArgs.moons).toBe(props.moons)
-        expect(childrenArgs.loading).toEqual(false)
-        expect(childrenArgs.error).toEqual(false)
         expect(childrenArgs.save).toEqual(expect.any(Function))
         expect(childrenArgs.remove).toEqual(expect.any(Function))
-        expect(keys.length).toEqual(6)
+        expect(keys.length).toEqual(4)
       })
     })
   })

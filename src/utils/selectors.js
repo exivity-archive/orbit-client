@@ -3,7 +3,7 @@ import omit from 'lodash/omit'
 
 import { notAllowedPropsCollection } from '../components/Collection'
 import { notAllowedPropsRecord } from '../components/Record'
-import { curried } from '../components/helpers'
+import { curried, insertIf } from '../components/helpers'
 
 export const getIdsFromRelatedCollection = (relatedToCollection, ownType) => {
   return relatedToCollection.reduce((ids, record) => {
@@ -42,14 +42,16 @@ export const memoizedCollectionAndHelpers = createSelector(
     const receivedEntities = omit(props, [...notAllowedPropsCollection, props.type])
     const isLoading = !!props.loading || loading
     const hasError = props.error || error
+    const cacheOnly = props.cache !== 'skip'
+    const queryStatus = isLoading || hasError ? null : collection
 
     return {
       ...receivedEntities,
-      [pluralizedType]: isLoading || hasError ? null : collection,
+      [pluralizedType]: cacheOnly ? collection : queryStatus,
       save: (collection) => props.updateStore(buildSaveTransforms(collection)),
       remove: (collection) => props.updateStore(buildRemoveTransforms(collection)),
-      loading: isLoading,
-      error: hasError
+      ...insertIf(!cacheOnly, { loading: isLoading }),
+      ...insertIf(!cacheOnly, { error: hasError })
     }
   }
 )

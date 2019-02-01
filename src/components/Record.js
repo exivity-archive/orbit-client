@@ -275,15 +275,7 @@ export { Record }
 
 const WithCrud = withCrud(Record)
 
-const WithData = withData(mapRecordsToProps, mergeProps)(WithCrud)
-
-export default (props) => {
-  if (props.cache === 'skip') {
-    return <WithCrud {...props} />
-  } else {
-    return <WithData {...props} />
-  }
-}
+export default withData(mapRecordsToProps, mergeProps)(WithCrud)
 
 Record.defaultProps = {
   relatedTo: null,

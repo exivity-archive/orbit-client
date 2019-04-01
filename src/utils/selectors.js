@@ -111,7 +111,7 @@ export const memoizedGetRecordAndHelpers = createSelector(
   (props, loading, error, record) => {
     const receivedEntities = omit(props, [...notAllowedPropsRecord, 'record', 'loading', 'error', 'initialRecord'])
 
-    return props.initialRecord
+    return props.cache === 'only'
       ? {
         [props.type]: record,
         ...receivedEntities

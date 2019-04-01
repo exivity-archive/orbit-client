@@ -10,7 +10,7 @@
       "Components"
     ],
     "ordering": "descending",
-    "version": "0.0.42",
+    "version": "0.0.63",
     "repository": "https://github.com/exivity/orbit-client",
     "native": false,
     "codeSandbox": true,

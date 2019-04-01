@@ -61,7 +61,7 @@ describe('Record', () => {
       ...standardProps,
       cache: 'only',
       id: 'earth',
-      initialRecord: {
+      record: {
         ...earth
       }
     }
@@ -69,7 +69,7 @@ describe('Record', () => {
     const propsMoon = {
       id: theMoon.id,
       type: 'moon',
-      initialRecord: theMoon,
+      record: theMoon,
       cache: 'only',
       ...contextFn
     }
@@ -131,7 +131,7 @@ describe('Record', () => {
         ...standardProps,
         cache: 'only',
         id: 'earth',
-        initialRecord: {
+        record: {
           ...earth
         },
         children: () => null,
@@ -158,7 +158,7 @@ describe('Record', () => {
         ...standardProps,
         cache: 'only',
         id: 'earth',
-        initialRecord: {
+        record: {
           ...earth
         },
         children: () => null,
@@ -186,7 +186,7 @@ describe('Record', () => {
           }
         }
 
-        const root = TestRenderer.create(<Record {...props} initialRecord={record} />).root
+        const root = TestRenderer.create(<Record {...props} record={record} />).root
         const instance = root.instance
 
         instance.addRelationship(hasOneRelation)
@@ -194,7 +194,7 @@ describe('Record', () => {
       })
 
       test('should create a hasMany relation if there isnt any', () => {
-        const root = TestRenderer.create(<Record {...props} initialRecord={{ ...Venus }} />).root
+        const root = TestRenderer.create(<Record {...props} record={{ ...Venus }} />).root
         const instance = root.instance
 
         instance.addRelationship(hasManyRelation)
@@ -211,7 +211,7 @@ describe('Record', () => {
           }
         }
 
-        const root = TestRenderer.create(<Record {...props} initialRecord={record} />).root
+        const root = TestRenderer.create(<Record {...props} record={record} />).root
         const instance = root.instance
 
         const secondHasManyRelation = { type: 'moon', id: 'test2' }
@@ -229,7 +229,7 @@ describe('Record', () => {
         ...standardProps,
         cache: 'only',
         id: 'earth',
-        initialRecord: {
+        record: {
           ...earth,
           relationships: {
             ...earth.relationships,

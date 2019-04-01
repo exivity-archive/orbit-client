@@ -16,8 +16,8 @@ class Record extends PureComponent {
   constructor (props) {
     super(props)
 
-    const controlled = this.isControlled('initialRecord')
-    const isControlled = props.id ? props.initialRecord : props.buildRecord(props.type)
+    const controlled = this.isControlled('record')
+    const isControlled = props.id ? props.record : props.buildRecord(props.type)
     const isntControlled = props.id ? null : props.buildRecord(props.type)
 
     this.state = {
@@ -28,6 +28,12 @@ class Record extends PureComponent {
   }
 
   static getDerivedStateFromProps (props, state) {
+    // if (props.record && props.record !== state.record) {
+    //   return {
+    //     record: props.record
+    //   }
+    // }
+
     if (props.cache === 'skip') {
       return {
         loading: !!props.loading ? props.loading : state.loading,
@@ -137,12 +143,14 @@ class Record extends PureComponent {
 
       if (obj.type === 'hasMany') {
         if (this.hasRelationship(key)) {
+          const alrdyRelated = record.relationships[key].data.find(item => item.id === relatedRecord.id)
           const relatedCollection = record.relationships[key].data.concat([ relatedRecord ])
-          this.setRelationship(key, relatedCollection)
+          !alrdyRelated && this.setRelationship(key, relatedCollection)
         } else {
           this.setRelationship(key, [ relatedRecord ])
         }
       }
+
     } else {
       throw new Error(`${relatedRecord.type} is not defined as a relation`)
     }
@@ -252,11 +260,11 @@ class Record extends PureComponent {
 
 const mapRecordsToProps = ({ id, type, related, relatedTo }) => {
   if (id) {
-    return { initialRecord: q => q.findRecord({ type, id }) }
+    return { record: q => q.findRecord({ type, id }) }
   }
 
   if (related && relatedTo) {
-    return { initialRecord: q => q.findRelatedRecord({ type: relatedTo.type, id: relatedTo.id }, type) }
+    return { record: q => q.findRelatedRecord({ type: relatedTo.type, id: relatedTo.id }, type) }
   }
 
   return {}

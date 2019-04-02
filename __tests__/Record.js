@@ -159,7 +159,11 @@ describe('Record', () => {
         cache: 'only',
         id: 'earth',
         record: {
-          ...earth
+          type: earth.type,
+          id: earth.id,
+          attributes: {
+            ...earth.attributes
+          }
         },
         children: () => null,
         schema
@@ -181,7 +185,7 @@ describe('Record', () => {
           ...earth,
           relationships: {
             sun: {
-              data: { type: 'sun', id: 'theSun'}
+              data: { type: 'sun', id: 'theSun' }
             }
           }
         }

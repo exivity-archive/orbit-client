@@ -21,18 +21,22 @@ class Record extends PureComponent {
     const isntControlled = props.id ? null : props.buildRecord(props.type)
 
     this.state = {
+      recordRef: controlled ? isControlled : isntControlled,
       record: controlled ? isControlled : isntControlled,
       loading: props.cache === 'skip',
       error: false
     }
+
+    this.addRelationship = this.addRelationship.bind(this)
   }
 
   static getDerivedStateFromProps (props, state) {
-    // if (props.record && props.record !== state.record) {
-    //   return {
-    //     record: props.record
-    //   }
-    // }
+    if (props.record && props.record !== state.recordRef) {
+      return {
+        recordRef: props.record,
+        record: props.record
+      }
+    }
 
     if (props.cache === 'skip') {
       return {
@@ -126,10 +130,11 @@ class Record extends PureComponent {
     }
   }))
 
-  addRelationship = (relatedRecord) => {
+  addRelationship (relatedRecord) {
     const { schema, type } = this.props
     const { record } = this.state
 
+    console.log('hieee')
     const model = schema.getModel(type)
     const relationships = Object.entries(model.relationships)
     const relationship = relationships.find(([relation, obj]) => obj.model === relatedRecord.type)

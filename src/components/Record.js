@@ -31,7 +31,7 @@ class Record extends PureComponent {
   }
 
   static getDerivedStateFromProps (props, state) {
-    if (props.record && props.record !== state.recordRef) {
+    if (props.record !== state.recordRef) {
       return {
         recordRef: props.record,
         record: props.record

@@ -31,7 +31,7 @@ class Record extends PureComponent {
   }
 
   static getDerivedStateFromProps (props, state) {
-    if (props.record !== state.recordRef) {
+    if (props.record && props.record !== state.recordRef) {
       return {
         recordRef: props.record,
         record: props.record
@@ -134,7 +134,6 @@ class Record extends PureComponent {
     const { schema, type } = this.props
     const { record } = this.state
 
-    console.log('hieee')
     const model = schema.getModel(type)
     const relationships = Object.entries(model.relationships)
     const relationship = relationships.find(([relation, obj]) => obj.model === relatedRecord.type)
@@ -279,7 +278,7 @@ const mergeProps = (record, ownProps) => {
   return {
     ...ownProps,
     ...record,
-    key: ownProps.id,
+    key: ownProps.id ? ownProps.id : 'new',
     id: ownProps.id || (ownProps.relatedTo && ownProps.relatedTo.id)
   }
 }

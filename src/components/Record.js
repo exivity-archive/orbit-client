@@ -278,8 +278,9 @@ const mergeProps = (record, ownProps) => {
   return {
     ...ownProps,
     ...record,
-    key: ownProps.id ? ownProps.id : 'new',
-    id: ownProps.id || (ownProps.relatedTo && ownProps.relatedTo.id)
+    key: ownProps.id,
+    id: ownProps.id || (ownProps.relatedTo && ownProps.relatedTo.id),
+    record: ownProps.id ? record.record : undefined
   }
 }
 

@@ -8,7 +8,7 @@ class Crud extends PureComponent {
     return buildRecord(type)
   }
 
-  isRecord = (record) => record.hasOwnProperty('type')
+  isRecord = (record) => record && record.hasOwnProperty('type')
 
   add = async (record, options) => {
     const { beforeAdd, addRecord, onAdd, onError, extensions } = this.props

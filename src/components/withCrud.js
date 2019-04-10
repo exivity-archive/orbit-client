@@ -12,14 +12,15 @@ function getDisplayName(WrappedComponent) {
 const withCrud = (WrappedComponent) => {
   class ModelWithCrud extends PureComponent {
     render () {
-      const { 
-        beforeAdd, 
+      const {
+        beforeAdd,
         onAdd,
-        beforeUpdate, 
-        onUpdate, 
-        beforeRemove, 
-        onRemove, 
-        ...rest 
+        beforeUpdate,
+        onUpdate,
+        beforeRemove,
+        onRemove,
+        onError,
+        ...rest
       } = this.props
 
       return (
@@ -31,7 +32,8 @@ const withCrud = (WrappedComponent) => {
               beforeUpdate={beforeUpdate}
               onUpdate={onUpdate}
               beforeRemove={beforeRemove}
-              onRemove={onRemove}>
+              onRemove={onRemove}
+              onError={onError}>
               {(extendedCrud) => (
                 <WrappedComponent {...rest} schema={schema} {...extendedCrud} />
               )}
